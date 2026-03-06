@@ -1,0 +1,85 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var AuthorizeByVirtualDevice $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+/** @var $escaper Escaper */
+
+use Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\AuthorizeByVirtualDevice;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+?>
+
+<?php
+ $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
+ $errorMessage = $escaper->escapeJs($block->escapeHtml(__('Error during authorization.')));
+
+ $scriptString = <<<script
+require(['prototype'], function(){
+
+//<![CDATA[
+    function authorizeRequest() {
+        var authorizationMessage = $('authorization_result');
+
+        new Ajax.Request('{$ajaxUrl}', {
+            onSuccess: function(response) {
+                var result = '{$errorMessage}';
+                try {
+                    if (response.responseText.isJSON()) {
+                        response = response.responseText.evalJSON();
+                        result = response.message;
+                    }
+                    if (response.is_authenticated == 1) {
+                        authorizationMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                        addClassName('note');
+                        authorizationMessage.setStyle({color:'green'});
+                    } else {
+                        authorizationMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        if (authorizationMessage.style.removeProperty) {
+                            authorizationMessage.style.removeProperty('color');
+                        } else {
+                            authorizationMessage.style.removeAttribute('color');
+                        }
+                    }
+                } catch (e) {
+                    authorizationMessage.removeClassName('hidden').addClassName('admin__field-error');
+                }
+                authorizationMessage.update(result);
+            }
+        });
+    }
+
+    window.authorizeRequest = authorizeRequest;
+//]]>
+
+});
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag(
+        'script',
+        [],
+        $scriptString,
+        false
+); ?>
+
+<div class="actions actions-authorize-request">
+    <p class="admin__field-error hidden" id="authorization_result"></p>
+    <button class="action-authorize-request" type="button" id="authorize-request">
+        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderTag(
+        'style',
+        [],
+        '#authorization_result {margin-bottom: 10px;}',
+        false
+); ?>
+<?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+        'onclick',
+        'authorizeRequest();',
+        '#authorize-request'
+); ?>

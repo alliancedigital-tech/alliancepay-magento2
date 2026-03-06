@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="order_additional_info">
+            <block class="Alliance\AlliancePay\Block\Adminhtml\Order\View\PaymentStatus"
+                   name="alliance.payment.status"
+                   template="Alliance_AlliancePay::order/payment_status.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

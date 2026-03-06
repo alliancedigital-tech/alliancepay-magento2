@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Alliance\AlliancePay\Api\GatewayClientInterface"
+                type="Alliance\AlliancePay\Model\Payment\Gateway\HttpClient" />
+    <preference for="Alliance\AlliancePay\Api\SensitiveDataManagerInterface"
+                type="Alliance\AlliancePay\Model\Config\SensitiveDataManager" />
+    <preference for="Alliance\AlliancePay\Api\PaymentProcessorInterface"
+                type="Alliance\AlliancePay\Model\Payment\Processor\PaymentProcessor" />
+    <preference for="Alliance\AlliancePay\Api\Data\AllianceOrderInterface"
+                type="Alliance\AlliancePay\Model\AllianceOrder" />
+    <preference for="Alliance\AlliancePay\Api\RefundManagerInterface"
+                type="Alliance\AlliancePay\Model\Payment\Processor\RefundProcessor"/>
+    <preference for="Alliance\AlliancePay\Api\Data\AllianceOrderInterface"
+                type="Alliance\AlliancePay\Model\AllianceOrder" />
+    <preference for="Alliance\AlliancePay\Api\AllianceOrderRepositoryInterface"
+                type="Alliance\AlliancePay\Model\AllianceOrderRepository" />
+    <preference for="Alliance\AlliancePay\Api\ConvertDataServiceInterface"
+                type="Alliance\AlliancePay\Service\ConvertData\ConvertDataService" />
+    <preference for="Alliance\AlliancePay\Api\CallbackHandlerInterface"
+                type="Alliance\AlliancePay\Model\Api\CallbackHandler" />
+    <preference for="Alliance\AlliancePay\Api\RefundRepositoryInterface"
+                type="Alliance\AlliancePay\Model\RefundRepository" />
+    <preference for="Alliance\AlliancePay\Api\Data\RefundInterface"
+                type="Alliance\AlliancePay\Model\Refund" />
+    <type name="Alliance\AlliancePay\Logger\Handler">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/alliance_payment.log</argument>
+        </arguments>
+    </type>
+    <type name="Alliance\AlliancePay\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">alliance_pay</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">Alliance\AlliancePay\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="payment/alliance_payment_config/authorization_key" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
+        <arguments>
+            <argument name="methodCodes" xsi:type="array">
+                <item name="alliance_pay"
+                      xsi:type="const">Alliance\AlliancePay\Model\Payment\AlliancePayment::PAYMENT_METHOD_CODE</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Model\Service\CreditmemoService">
+        <plugin name="alliance_create_open_refund"
+                type="Alliance\AlliancePay\Plugin\CreateOpenRefund"
+                sortOrder="10"/>
+    </type>
+</config>

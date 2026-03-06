@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config" title="Configuration" translate="title" sortOrder="20">
+                            <resource id="Magento_Payment::payment">
+                                <resource id="Alliance_AlliancePay::config_payment_alliance_payment_config"
+                                          title="Alliance Payment Configuration"/>
+                            </resource>
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="Magento_Sales::sales">
+                    <resource id="Alliance_AlliancePay::check_payment_status" title="Check Bank Payment Status"/>
+                    <resource id="Alliance_AlliancePay::process_refund" title="Process Bank Refund"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

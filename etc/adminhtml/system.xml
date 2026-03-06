@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="alliance_payment_config"
+                   translate="label"
+                   type="text"
+                   sortOrder="1000"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Alliance Payment</label>
+                <field id="authorize_by_virtual_device"
+                       translate="button_label"
+                       sortOrder="1"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <button_label>Authorize by virtual device</button_label>
+                    <frontend_model>Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\AuthorizeByVirtualDevice</frontend_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="5"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title"
+                       translate="label"
+                       type="text"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Title</label>
+                    <config_path>payment/alliance_payment_config/title</config_path>
+                </field>
+                <field id="api_url"
+                       translate="label"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>API URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                <field id="status_page_type"
+                       translate="label"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Payment Type</label>
+                    <source_model>Alliance\AlliancePay\Model\Config\Source\StatusPageType</source_model>
+                </field>
+                <field id="service_code"
+                       translate="label"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Service Code</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="merchant_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Merchant Id</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="authorization_key"
+                       translate="label"
+                       type="textarea"
+                       sortOrder="50"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Authorization key</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="device_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="60"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Device Id</label>
+                    <frontend_model>Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\DisabledField</frontend_model>
+                </field>
+                <field id="refresh_token"
+                       translate="label"
+                       type="text"
+                       sortOrder="70"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Refresh Token</label>
+                    <frontend_model>Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\DisabledField</frontend_model>
+                </field>
+                <field id="success_order_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="80"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Successful Payment Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="failed_order_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="90"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Failed Payment Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="success_refund_order_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="100"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Successful Refund Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="failed_refund_order_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="110"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Failed Refund Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="is_logs_enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="120"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Enable Payment Logs</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

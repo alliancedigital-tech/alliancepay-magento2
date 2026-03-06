@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="alliance_payment">
+        <job name="alliance_payment_reauthorize_token"
+             instance="Alliance\AlliancePay\Cron\ReAuthorizeByVirtualDevice"
+             method="execute">
+            <schedule>0 0 * * *</schedule>
+        </job>
+    </group>
+</config>

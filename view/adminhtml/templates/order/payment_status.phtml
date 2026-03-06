@@ -1,0 +1,74 @@
+<?php /** @var Alliance\AlliancePay\Block\Adminhtml\Order\View\PaymentStatus $block */
+
+use Alliance\AlliancePay\Api\Data\AllianceOrderInterface; ?>
+
+<?php if ($block->canCheckStatus()): ?>
+    <div class="fieldset" style="margin-top: 20px;">
+        <h4><?= __('Alliance Payment Status') ?></h4>
+        <div class="admin__field">
+            <label class="label">
+                <span><?= __('Payment Order Status') ?></span>
+            </label>
+            <div class="control">
+                <span id="alliance-order-status"><strong><?= /** @noEscape  */ $block->getAllianceOrderStatus(); ?></strong></span>
+            </div>
+        </div>
+
+        <div class="admin__field">
+            <button class="action primary" id="check-payment-status-btn">
+                <?= __('Check Payment Status') ?>
+            </button>
+        </div>
+
+        <div id="payment-operations" style="margin-top: 20px;">
+            <h5><?= __('Payment Operations') ?></h5>
+            <table class="admin__table-secondary">
+                <thead>
+                <tr>
+                    <th><?= __('Date') ?></th>
+                    <th><?= __('Status') ?></th>
+                    <th><?= __('Operation ID') ?></th>
+                    <th><?= __('Operation Type') ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($block->getOperations() as $operation): ?>
+                    <tr>
+                        <td><?= /** @noEscape */ $operation[AllianceOrderInterface::OPERATION_CREATION_TIME] ?></td>
+                        <td><?= /** @noEscape */ $operation[AllianceOrderInterface::OPERATION_STATUS] ?></td>
+                        <td><?= /** @noEscape */ $operation[AllianceOrderInterface::OPERATION_ID] ?></td>
+                        <td><?= /** @noEscape */ $operation[AllianceOrderInterface::OPERATION_TYPE] ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        require(['jquery'], function($) {
+            $('#check-payment-status-btn').on('click', function() {
+                var orderId = <?= (int)$block->getOrderId() ?>;
+
+                $.ajax({
+                    url: '<?= $this->escapeJs($block->getCheckStatusUrl()) ?>',
+                    type: 'POST',
+                    data: window.FORM_KEY,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#alliance-payment-status').text(response.status);
+                            alert('<?= __('Payment status updated') ?>');
+                            window.location.reload();
+                        } else {
+                            alert('<?= __('Error') ?>: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('<?= __('Error checking payment status') ?>');
+                    }
+                });
+            });
+        });
+    </script>
+<?php endif; ?>

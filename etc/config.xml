@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <alliance_pay>
+                <model>Alliance\AlliancePay\Model\Payment\AlliancePayment</model>
+                <title>Alliance Pay</title>
+                <active>1</active>
+                <allowspecific>0</allowspecific>
+                <group>alliance</group>
+                <is_gateway>true</is_gateway>
+                <can_order>true</can_order>
+                <can_authorize>false</can_authorize>
+                <can_capture>false</can_capture>
+                <can_use_checkout>true</can_use_checkout>
+                <can_use_internal>true</can_use_internal>
+                <is_redirect>true</is_redirect>
+                <can_refund>1</can_refund>
+                <can_refund_in_invoice>1</can_refund_in_invoice>
+            </alliance_pay>
+        </payment>
+    </default>
+</config>

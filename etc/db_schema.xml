@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="alliance_checkout_integration_order" resource="default" engine="innodb"
+           comment="Alliance Checkout Integration Order Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="order_id" unsigned="false" nullable="false" identity="false"
+                comment="Order ID"/>
+        <column xsi:type="varchar" name="merchant_request_id" nullable="false" length="255"
+                comment="Merchant Request ID"/>
+        <column xsi:type="varchar" name="hpp_order_id" nullable="false" length="255"
+                comment="HPP Order ID"/>
+        <column xsi:type="varchar" name="merchant_id" nullable="false" length="255"
+                comment="Merchant ID"/>
+        <column xsi:type="int" name="coin_amount" unsigned="false" nullable="false"
+                comment="Coin Amount"/>
+        <column xsi:type="varchar" name="hpp_pay_type" nullable="false" length="50"
+                comment="HPP Pay Type"/>
+        <column xsi:type="varchar" name="order_status" nullable="false" length="50"
+                comment="Order Status"/>
+        <column xsi:type="text" name="payment_methods" nullable="false"
+                comment="Payment Methods"/>
+        <column xsi:type="datetime" name="create_date" nullable="false"
+                comment="Create Date"/>
+        <column xsi:type="datetime" name="updated_at" nullable="true"
+                comment="Updated At"/>
+        <column xsi:type="varchar" name="operation_id" nullable="true" length="255"
+                comment="Operation ID"/>
+        <column xsi:type="varchar" name="ecom_order_id" nullable="true" length="255"
+                comment="Ecom Order ID"/>
+        <column xsi:type="boolean" name="is_callback_returned" nullable="false" default="false"
+                comment="Is Callback Returned"/>
+        <column xsi:type="text" name="callback_data" nullable="true"
+                comment="Callback Data"/>
+        <column xsi:type="datetime" name="expired_order_date" nullable="false"
+                comment="Expired Order Date"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="ALLIANCE_CHECKOUT_INTEGRATION_ORDER_MERCHANT_REQUEST_ID" indexType="btree">
+            <column name="merchant_request_id"/>
+        </index>
+        <index referenceId="ALLIANCE_CHECKOUT_INTEGRATION_ORDER_HPP_ORDER_ID" indexType="btree">
+            <column name="hpp_order_id"/>
+        </index>
+        <index referenceId="ALLIANCE_CHECKOUT_INTEGRATION_ORDER_MERCHANT_ID" indexType="btree">
+            <column name="merchant_id"/>
+        </index>
+        <index referenceId="ALLIANCE_CHECKOUT_INTEGRATION_ORDER_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+    </table>
+    <table name="alliance_integration_order_refund" resource="default" engine="innodb"
+           comment="Alliance Integration Order Refund Table">
+        <column xsi:type="int" name="refund_id" unsigned="false" nullable="false" identity="true"
+                comment="Refund ID"/>
+        <column xsi:type="int" name="order_id" unsigned="false" nullable="false"
+                comment="Order ID"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="255"
+                comment="Type"/>
+        <column xsi:type="varchar" name="rrn" nullable="false" length="255"
+                comment="RRN"/>
+        <column xsi:type="varchar" name="purpose" nullable="false" length="255"
+                comment="Purpose"/>
+        <column xsi:type="varchar" name="comment" nullable="false" length="255"
+                comment="Comment"/>
+        <column xsi:type="int" name="coin_amount" unsigned="false" nullable="false"
+                comment="Coin Amount"/>
+        <column xsi:type="varchar" name="merchant_id" nullable="false" length="255"
+                comment="Merchant ID"/>
+        <column xsi:type="varchar" name="operation_id" nullable="false" length="255"
+                comment="Operation ID"/>
+        <column xsi:type="varchar" name="ecom_operation_id" nullable="false" length="255"
+                comment="Ecom Operation ID"/>
+        <column xsi:type="varchar" name="merchant_name" nullable="true" length="255"
+                comment="Merchant Name"/>
+        <column xsi:type="varchar" name="approval_code" nullable="false" length="255"
+                comment="Approval Code"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="255"
+                comment="Status"/>
+        <column xsi:type="int" name="transaction_type" unsigned="false" nullable="false"
+                comment="Transaction Type"/>
+        <column xsi:type="varchar" name="merchant_request_id" nullable="false" length="255"
+                comment="Merchant Request ID"/>
+        <column xsi:type="varchar" name="transaction_currency" nullable="false" length="255"
+                comment="Transaction Currency"/>
+        <column xsi:type="int" name="merchant_commission" unsigned="false" nullable="true"
+                comment="Merchant Commission"/>
+        <column xsi:type="datetime" name="create_date_time" nullable="false"
+                comment="Create Date Time"/>
+        <column xsi:type="datetime" name="modification_date_time" nullable="false"
+                comment="Modification Date Time"/>
+        <column xsi:type="varchar" name="action_code" nullable="false" length="255"
+                comment="Action Code"/>
+        <column xsi:type="varchar" name="response_code" nullable="false" length="255"
+                comment="Response Code"/>
+        <column xsi:type="varchar" name="description" nullable="false" length="255"
+                comment="Description"/>
+        <column xsi:type="varchar" name="processing_merchant_id" nullable="false" length="255"
+                comment="Processing Merchant ID"/>
+        <column xsi:type="varchar" name="processing_terminal_id" nullable="false" length="255"
+                comment="Processing Terminal ID"/>
+        <column xsi:type="text" name="transaction_response_info" nullable="false"
+                comment="Transaction Response Info"/>
+        <column xsi:type="varchar" name="bank_code" nullable="false" length="255"
+                comment="Bank Code"/>
+        <column xsi:type="varchar" name="payment_system" nullable="false" length="255"
+                comment="Payment System"/>
+        <column xsi:type="varchar" name="product_type" nullable="false" length="255"
+                comment="Product Type"/>
+        <column xsi:type="varchar" name="notification_url" nullable="false" length="255"
+                comment="Notification URL"/>
+        <column xsi:type="varchar" name="payment_service_type" nullable="false" length="255"
+                comment="Payment Service Type"/>
+        <column xsi:type="varchar" name="notification_encryption" nullable="false" length="255"
+                comment="Notification Encryption"/>
+        <column xsi:type="varchar" name="original_operation_id" nullable="false" length="255"
+                comment="Original Operation ID"/>
+        <column xsi:type="int" name="original_coin_amount" unsigned="false" nullable="false"
+                comment="Original Coin Amount"/>
+        <column xsi:type="varchar" name="original_ecom_operation_id" nullable="false" length="255"
+                comment="Original Ecom Operation ID"/>
+        <column xsi:type="varchar" name="rrn_original" nullable="false" length="255"
+                comment="RRN Original"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="refund_id"/>
+        </constraint>
+        <index referenceId="ALLIANCE_INTEGRATION_ORDER_REFUND_MERCHANT_REQUEST_ID" indexType="btree">
+            <column name="merchant_request_id"/>
+        </index>
+        <index referenceId="ALLIANCE_INTEGRATION_ORDER_REFUND_MERCHANT_ID" indexType="btree">
+            <column name="merchant_id"/>
+        </index>
+    </table>
+</schema>

@@ -1,0 +1,23 @@
+{
+    "name": "alliance/module-alliance-pay",
+    "version": "1.0.0",
+    "description": "Alliance Bank payment method trough the Hosted Payment Page.",
+    "type": "magento2-module",
+    "require": {
+        "php": "^8.2",
+        "magento/framework": "*",
+        "kelvinmo/simplejwt": "^1.0",
+        "league/iso3166": "4.3.3"
+    },
+    "license": [
+        "MIT"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Alliance\\AlliancePay\\": ""
+        }
+    }
+}

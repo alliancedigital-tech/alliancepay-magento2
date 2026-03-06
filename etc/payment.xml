@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment.xsd">
+    <methods>
+        <method name="alliance_pay">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+    </methods>
+    <groups>
+        <group id="alliance">
+            <label>Alliance Pay</label>
+        </group>
+    </groups>
+</payment>
