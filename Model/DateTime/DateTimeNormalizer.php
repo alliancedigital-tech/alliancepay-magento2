@@ -18,6 +18,8 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 class DateTimeNormalizer
 {
     public const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    public const BIRTHDAY_INPUT_FORMAT  = 'Y-m-d';
+    public const BIRTHDAY_OUTPUT_FORMAT = 'd.m.Y';
 
     public function __construct(
         private TimezoneInterface $timezone,
@@ -28,7 +30,7 @@ class DateTimeNormalizer
      */
     public function formatCustomDate(string $inputDate): string
     {
-        $cleanMilliseconds = preg_replace('/.\d{3}$/', '', $inputDate);
+        $cleanMilliseconds = preg_replace('/\.\d{3}$/', '', $inputDate);
         $normalized = str_replace('.', '-', $cleanMilliseconds);
         $date = DateTime::createFromFormat(
             self::DATE_TIME_FORMAT,
@@ -37,5 +39,25 @@ class DateTimeNormalizer
         );
 
         return $date->format(self::DATE_TIME_FORMAT);
+    }
+
+    /**
+     * @param string $inputDate
+     * @return string|null
+     */
+    public function formatBirthday(string $inputDate): ?string
+    {
+        $date = DateTime::createFromFormat(self::BIRTHDAY_INPUT_FORMAT, $inputDate);
+
+        if ($date === false) {
+            return null;
+        }
+
+        $errors = DateTime::getLastErrors();
+        if (!empty($errors['warning_count']) || !empty($errors['error_count'])) {
+            return null;
+        }
+
+        return $date->format(self::BIRTHDAY_OUTPUT_FORMAT);
     }
 }

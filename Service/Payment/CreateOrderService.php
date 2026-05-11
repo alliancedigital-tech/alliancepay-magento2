@@ -11,12 +11,12 @@ use Alliance\AlliancePay\Api\AllianceOrderRepositoryInterface;
 use Alliance\AlliancePay\Api\ConvertDataServiceInterface;
 use Alliance\AlliancePay\Api\Data\AllianceOrderInterface;
 use Alliance\AlliancePay\Api\GatewayClientInterface;
-use Alliance\AlliancePay\Exception\GatewayException;
+use Alliance\AlliancePay\Api\CustomerDataValidatorInterface;
+use Alliance\AlliancePay\Api\Data\AllianceOrderInterfaceFactory;
 use Alliance\AlliancePay\Logger\Logger;
 use Alliance\AlliancePay\Model\Config\AllianceConfig;
 use Alliance\AlliancePay\Model\Config\CountryCode\CountryCodeProvider;
 use Alliance\AlliancePay\Model\Payment\AlliancePayment;
-use Alliance\AlliancePay\Api\Data\AllianceOrderInterfaceFactory;
 use Alliance\AlliancePay\Service\Payment\Service\ServiceAbstract;
 use Exception;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -44,6 +44,7 @@ class CreateOrderService extends ServiceAbstract
         private readonly Resolver $localeResolver,
         private readonly ConvertDataServiceInterface $convertDataService,
         private readonly CountryCodeProvider $countryCodeProvider,
+        private readonly CustomerDataValidatorInterface $customerDataValidator,
         private Logger $logger
     ) {}
 
@@ -120,7 +121,7 @@ class CreateOrderService extends ServiceAbstract
             'notificationUrl' => $this->alliancePayment->getCallbackUrl(),
             'merchantId' => $this->allianceConfig->getMerchantId(),
             'statusPageType' => $this->allianceConfig->getStatusPageType(),
-            'merchantRequestId'=> $this->generateMerchantRequestId(),
+            'merchantRequestId' => $this->generateMerchantRequestId(),
             'customerData' => $this->prepareCustomerData($order),
         ];
 
@@ -136,6 +137,7 @@ class CreateOrderService extends ServiceAbstract
     private function prepareCustomerData(OrderInterface $order): array
     {
         $data = [];
+        $billingAddress = $order->getBillingAddress();
 
         if (!$order->getCustomerIsGuest()) {
             $customer = $this->customer->get($order->getCustomerEmail());
@@ -144,17 +146,21 @@ class CreateOrderService extends ServiceAbstract
             if (!empty($dob)) {
                 $data['senderBirthday'] = $dob;
             }
+
+            $data['senderFirstName'] = $customer->getFirstname() ?? '';
+            $data['senderMiddleName'] = $customer->getMiddlename() ?? '';
+            $data['senderLastName'] = $customer->getLastname() ?? '';
+        } else {
+            $data['senderFirstName'] = $billingAddress->getFirstname() ?? '';
+            $data['senderMiddleName'] = $billingAddress->getMiddlename() ?? '';
+            $data['senderLastName'] = $billingAddress->getLastname() ?? '';
         }
 
-        $billingAddress = $order->getBillingAddress();
         $countryCode = $this->countryCodeProvider->getCountryNumericCodeByAlpha2(
             $billingAddress->getCountryId()
         );
         $data['senderCustomerId'] = $this->getCustomerId($order);
         $data['senderEmail'] = $billingAddress->getEmail() ?? '';
-        $data['senderFirstName'] = $billingAddress->getFirstname() ?? '';
-        $data['senderMiddleName'] = $billingAddress->getMiddlename() ?? '';
-        $data['senderLastName'] = $billingAddress->getLastname() ?? '';
         $data['senderRegion'] = $billingAddress->getRegion() ?? '';
         $data['senderCountry'] = $billingAddress->getCountryId() ?? '';
         $data['senderStreet'] = $billingAddress->getStreet()[0] ?? '';
@@ -167,24 +173,7 @@ class CreateOrderService extends ServiceAbstract
             $data['senderCountry'] = $countryCode;
         }
 
-        return $this->validateAndClenUpData($data);
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function validateAndClenUpData(array $data): array
-    {
-        $validatedData = [];
-
-        foreach ($data as $key => $value) {
-            if (!empty($value)) {
-                $validatedData[$key] = $value;
-            }
-        }
-
-        return $validatedData;
+        return $this->customerDataValidator->validate($data);
     }
 
     /**

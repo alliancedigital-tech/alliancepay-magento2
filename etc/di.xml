@@ -16,8 +16,6 @@
                 type="Alliance\AlliancePay\Model\AllianceOrder" />
     <preference for="Alliance\AlliancePay\Api\RefundManagerInterface"
                 type="Alliance\AlliancePay\Model\Payment\Processor\RefundProcessor"/>
-    <preference for="Alliance\AlliancePay\Api\Data\AllianceOrderInterface"
-                type="Alliance\AlliancePay\Model\AllianceOrder" />
     <preference for="Alliance\AlliancePay\Api\AllianceOrderRepositoryInterface"
                 type="Alliance\AlliancePay\Model\AllianceOrderRepository" />
     <preference for="Alliance\AlliancePay\Api\ConvertDataServiceInterface"
@@ -28,6 +26,8 @@
                 type="Alliance\AlliancePay\Model\RefundRepository" />
     <preference for="Alliance\AlliancePay\Api\Data\RefundInterface"
                 type="Alliance\AlliancePay\Model\Refund" />
+    <preference for="Alliance\AlliancePay\Api\CustomerDataValidatorInterface"
+                type="Alliance\AlliancePay\Model\Validator\CustomerDataValidator" />
     <type name="Alliance\AlliancePay\Logger\Handler">
         <arguments>
             <argument name="fileName" xsi:type="string">/var/log/alliance_payment.log</argument>
