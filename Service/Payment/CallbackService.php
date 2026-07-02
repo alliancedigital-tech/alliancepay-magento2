@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 
 declare(strict_types=1);
@@ -17,6 +17,7 @@ use Alliance\AlliancePay\Service\ConvertData\ConvertDataService;
 use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\InvoiceRepositoryInterface;
@@ -38,6 +39,7 @@ class CallbackService
         private readonly InvoiceService $invoiceService,
         private readonly InvoiceRepositoryInterface $invoiceRepository,
         private CreditmemoManagementInterface $creditmemoManagement,
+        private readonly SerializerInterface $serializer,
         private Logger $logger
     ) {}
 
@@ -65,12 +67,15 @@ class CallbackService
                 );
                 $orderId = $allianceOrder->getOrderId();
                 $order = $this->orderRepository->get($orderId);
+                $previousCallbackData = $allianceOrder->getCallbackData();
                 $allianceOrder->setCallbackData($callbackData);
                 $allianceOrder->setIsCallbackReturned(true);
                 $this->updateOrderByCallback(
                     $order,
                     $allianceOrder,
-                    $convertedCallback
+                    $convertedCallback,
+                    $callbackData,
+                    $previousCallbackData
                 );
             }
         } catch (Exception $e) {
@@ -93,14 +98,18 @@ class CallbackService
     /**
      * @param OrderInterface $order
      * @param AllianceOrderInterface $allianceOrder
-     * @param array $callbackData
+     * @param array $callbackData snake_case converted payload
+     * @param array $rawCallbackData Original camelCase payload
+     * @param string|null $previousCallbackData JSON string of previously saved callback_data
      * @return void
      * @throws LocalizedException
      */
     private function updateOrderByCallback(
         OrderInterface $order,
         AllianceOrderInterface $allianceOrder,
-        array $callbackData
+        array $callbackData,
+        array $rawCallbackData,
+        ?string $previousCallbackData
     ): void {
         $status = $callbackData[AllianceOrderInterface::ORDER_STATUS] ?? AllianceOrderInterface::ORDER_STATUS_PENDING;
 
@@ -116,33 +125,43 @@ class CallbackService
             AllianceOrderInterface::class
         );
 
+        $this->updateOperationsInCallbackData(
+            $allianceOrder,
+            $rawCallbackData,
+            $previousCallbackData
+        );
+
+        $allianceOrder->setTransactionType(
+            $this->getTransactionTypeFromPaymentOperation(
+                $this->getOperationsFromCallbackData($callbackData)
+            )
+        );
+
         $this->allianceOrderRepository->save($allianceOrder);
         $this->updateRefunds($order, $callbackData);
     }
 
+    /**
+     * @param OrderInterface $order
+     * @param array $callbackData
+     * @return void
+     */
     public function updateRefunds(OrderInterface $order, array $callbackData): void
     {
         if (!$order->hasCreditmemos()) {
             return;
         }
 
-        $operationIds = [];
-        if (isset($callbackData['operations'])) {
-            $operations = $callbackData['operations'];
-        } else {
-            $operations = isset($callbackData['operation']) ? [$callbackData['operation']] : [];
-        }
+        $operations = $this->getOperationsFromCallbackData($callbackData);
+        $operationIds = array_column($operations, RefundService::REFUND_DATA_FIELD_OPERATION_ID);
 
         foreach ($order->getCreditmemosCollection() as $creditmemo) {
-            if ($creditmemo->getState() == Creditmemo::STATE_OPEN && !empty($creditmemo->getTransactionId())) {
-                foreach ($operations as $operation) {
-                    $operationIds[] = $operation[RefundService::REFUND_DATA_FIELD_OPERATION_ID] ?? '';
-                }
+            if ($creditmemo->getState() == Creditmemo::STATE_OPEN
+                && !empty($creditmemo->getTransactionId())
+                && in_array($creditmemo->getTransactionId(), $operationIds)
+            ) {
+                $this->creditmemoManagement->refund($creditmemo);
             }
-        }
-
-        if (in_array($creditmemo->getTransactionId(), $operationIds)) {
-            $this->creditmemoManagement->refund($creditmemo);
         }
     }
 
@@ -190,38 +209,129 @@ class CallbackService
     }
 
     /**
+     * @param AllianceOrderInterface $allianceOrder
+     * @param array $rawCallbackData
+     * @param string|null $previousCallbackData
+     * @return void
+     */
+    private function updateOperationsInCallbackData(
+        AllianceOrderInterface $allianceOrder,
+        array $rawCallbackData,
+        ?string $previousCallbackData
+    ): void {
+        $newOperations = $this->getOperationsFromCallbackData($rawCallbackData);
+
+        if (empty($newOperations)) {
+            return;
+        }
+
+        $storedData = $previousCallbackData !== null
+            ? (array) $this->serializer->unserialize($previousCallbackData)
+            : [];
+
+        $existingOperations = (array) ($storedData['operations'] ?? []);
+        if (empty($existingOperations) && isset($storedData['operation'])) {
+            $existingOperations = [$storedData['operation']];
+        }
+
+        $existingIds = array_column($existingOperations, 'operationId');
+
+        foreach ($newOperations as $operation) {
+            $operationId = $operation['operationId'] ?? null;
+
+            if ($operationId === null || $operationId === '') {
+                $existingOperations[] = $operation;
+                continue;
+            }
+
+            if (!in_array($operationId, $existingIds, strict: true)) {
+                $existingOperations[] = $operation;
+                $existingIds[]        = $operationId;
+            }
+        }
+
+        $currentCallbackData = (array) $this->serializer->unserialize(
+            $allianceOrder->getCallbackData() ?? '[]'
+        );
+
+        $currentCallbackData['operations'] = $existingOperations;
+        unset($currentCallbackData['operation']);
+
+        $allianceOrder->setCallbackData($currentCallbackData);
+    }
+
+    /**
      * @param array $callbackData
      * @return string
      */
     private function getOperationId(array $callbackData): string
     {
-        if (isset($callbackData['operation'])) {
-            $convertedOperation = $this->convertDataService->camelToSnakeArrayKeys($callbackData['operation']);
-            if (isset($convertedOperation['type'])
-                && $convertedOperation['type'] === AlliancePayment::OPERATION_TYPE
-                && isset($convertedOperation[AllianceOrderInterface::OPERATION_STATUS])
-                && $convertedOperation[AllianceOrderInterface::OPERATION_STATUS]
-                    === AllianceOrderInterface::ORDER_STATUS_SUCCESS
-            ) {
+        $operations = $this->getOperationsFromCallbackData($callbackData);
 
-            }
+        foreach ($operations as $operation) {
+            $convertedOperation = $this->convertDataService->camelToSnakeArrayKeys($operation);
 
-            return $convertedOperation[AllianceOrderInterface::OPERATION_ID];
-        } elseif (isset($callbackData['operations']) && is_iterable($callbackData['operations'])) {
-            foreach ($callbackData['operations'] as $operation) {
-                $convertedOperation = $this->convertDataService->camelToSnakeArrayKeys($operation);
-                if (isset($convertedOperation[AllianceOrderInterface::OPERATION_ID])
-                    && isset($convertedOperation['type'])
-                    && $convertedOperation['type'] === AlliancePayment::OPERATION_TYPE
-                    && isset($convertedOperation[AllianceOrderInterface::OPERATION_STATUS])
-                    && $convertedOperation[AllianceOrderInterface::OPERATION_STATUS]
-                        === AllianceOrderInterface::ORDER_STATUS_SUCCESS
-                ) {
-                    return $convertedOperation[AllianceOrderInterface::OPERATION_ID];
-                }
+            if ($this->isSuccessfulPurchaseOperation($convertedOperation)) {
+                return $convertedOperation[AllianceOrderInterface::OPERATION_ID];
             }
         }
 
         return '';
+    }
+
+    /**
+     * @param array $operation
+     * @return bool
+     */
+    private function isSuccessfulPurchaseOperation(array $operation): bool
+    {
+        return isset(
+                $operation[AllianceOrderInterface::OPERATION_ID],
+                $operation['type'],
+                $operation[AllianceOrderInterface::OPERATION_STATUS]
+            )
+            && in_array(
+                $operation['type'],
+                [
+                    AlliancePayment::OPERATION_TYPE_PURCHASE,
+                    AlliancePayment::OPERATION_TYPE_A2A
+                ]
+            )
+            && $operation[AllianceOrderInterface::OPERATION_STATUS] === AllianceOrderInterface::ORDER_STATUS_SUCCESS;
+    }
+
+    /**
+     * @param array $operations
+     * @return int|null
+     */
+    private function getTransactionTypeFromPaymentOperation(array $operations): ?int
+    {
+        foreach ($operations as $operation) {
+            $operationConverted = $this->convertDataService->camelToSnakeArrayKeys($operation);
+            if (!empty($operationConverted[AllianceOrderInterface::OPERATION_TYPE])
+                && !empty($operationConverted[AllianceOrderInterface::TRANSACTION_TYPE])
+                && (
+                    $operationConverted[AllianceOrderInterface::OPERATION_TYPE] === AlliancePayment::OPERATION_TYPE_PURCHASE
+                    || $operationConverted[AllianceOrderInterface::OPERATION_TYPE] === AlliancePayment::OPERATION_TYPE_A2A
+                )
+            ) {
+                return $operationConverted[AllianceOrderInterface::TRANSACTION_TYPE];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $callbackData
+     * @return array
+     */
+    private function getOperationsFromCallbackData(array $callbackData): array
+    {
+        return match (true) {
+            isset($callbackData['operations']) => (array) $callbackData['operations'],
+            isset($callbackData['operation']) => [$callbackData['operation']],
+            default => [],
+        };
     }
 }

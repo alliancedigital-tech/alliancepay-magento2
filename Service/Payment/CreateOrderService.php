@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 
 declare(strict_types=1);
@@ -113,7 +113,7 @@ class CreateOrderService extends ServiceAbstract
 
         $data = [
             'coinAmount' => $coinAmount,
-            'hppPayType' => AlliancePayment::HPP_PAY_TYPE,
+            'hppPayType' => $this->allianceConfig->getPaymentType(),
             'paymentMethods' => AlliancePayment::PAYMENT_METHODS,
             'language' => $this->getStoreLanguage(),
             'successUrl' => $this->alliancePayment->getSuccessUrl(),
@@ -124,6 +124,12 @@ class CreateOrderService extends ServiceAbstract
             'merchantRequestId' => $this->generateMerchantRequestId(),
             'customerData' => $this->prepareCustomerData($order),
         ];
+
+        if ($data['hppPayType'] === AlliancePayment::HPP_PAY_TYPE_A2A) {
+            $data['directType'] = AlliancePayment::DIRECT_TYPE_BANK_LINK;
+            $data['priorityBankCode'] = AlliancePayment::PRIORITY_BANK_CODE;
+            $data['merchantComment'] = 'Payment for order #' . ($order->getIncrementId() ?? '');
+        }
 
         return $data;
     }

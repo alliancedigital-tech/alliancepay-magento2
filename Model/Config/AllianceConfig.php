@@ -1,12 +1,13 @@
 <?php
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 
 declare(strict_types=1);
 
 namespace Alliance\AlliancePay\Model\Config;
 
+use Alliance\AlliancePay\Model\Config\Source\PaymentType;
 use Alliance\AlliancePay\Model\Config\Source\StatusPageType;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
@@ -20,6 +21,7 @@ class AllianceConfig
     public const XML_PATH_ALLIANCE_PAY_API_URL = 'payment/alliance_payment_config/api_url';
     public const XML_PATH_ALLIANCE_PAY_MERCHANT_ID = 'payment/alliance_payment_config/merchant_id';
     public const XML_PATH_ALLIANCE_PAY_STATUS_PAGE_TYPE = 'payment/alliance_payment_config/status_page_type';
+    public const XML_PATH_ALLIANCE_PAYMENT_TYPE = 'payment/alliance_payment_config/payment_type';
     public const XML_PATH_ALLIANCE_PAY_SUCCESS_ORDER_STATUS = 'payment/alliance_payment_config/success_order_status';
     public const XML_PATH_ALLIANCE_PAY_FAILED_ORDER_STATUS = 'payment/alliance_payment_config/failed_order_status';
     public const XML_PATH_ALLIANCE_PAY_SUCCESS_REFUND_ORDER_STATUS = 'payment/alliance_payment_config/success_refund_order_status';
@@ -69,6 +71,14 @@ class AllianceConfig
     public function getStatusPageType(): ?string
     {
         return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_STATUS_PAGE_TYPE) ?? StatusPageType::DEFAULT_STATUS_PAGE_TYPE;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPaymentType(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAYMENT_TYPE) ?? PaymentType::DEFAULT_PAYMENT_TYPE;
     }
 
     /**

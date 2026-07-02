@@ -232,6 +232,23 @@ class AllianceOrder extends AbstractModel implements AllianceOrderInterface
     }
 
     /**
+     * @return int|null
+     */
+    public function getTransactionType(): ?int
+    {
+        return (int)$this->getData(self::TRANSACTION_TYPE);
+    }
+
+    /**
+     * @param int|null $transactionType
+     * @return void
+     */
+    public function setTransactionType(?int $transactionType): void
+    {
+        $this->setData(self::TRANSACTION_TYPE, $transactionType);
+    }
+
+    /**
      * @inheritDoc
      */
     public function getEcomOrderId(): ?string

@@ -23,6 +23,8 @@ interface AllianceOrderInterface
     public const CREATE_DATE = 'create_date';
     public const UPDATED_AT = 'updated_at';
     public const OPERATION_ID = 'operation_id';
+    public const TRANSACTION_TYPE = 'transaction_type';
+    public const TRANSACTION_TYPE_NO_REFUND = 102;
     public const ECOM_ORDER_ID = 'ecom_order_id';
     public const IS_CALLBACK_RETURNED = 'is_callback_returned';
     public const CALLBACK_DATA = 'callback_data';
@@ -157,6 +159,17 @@ interface AllianceOrderInterface
      * @return void
      */
     public function setOperationId(?string $operationId): void;
+
+    /**
+     * @return int|null
+     */
+    public function getTransactionType(): ?int;
+
+    /**
+     * @param int|null $transactionType
+     * @return void
+     */
+    public function setTransactionType(?int $transactionType): void;
 
     /**
      * @return string|null

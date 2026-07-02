@@ -30,7 +30,7 @@ class AlliancePayConfigProvider implements ConfigProviderInterface
         return [
             'payment' => [
                 AlliancePayment::PAYMENT_METHOD_CODE => [
-                    'active' => $this->alliancePayment->isActive(),
+                    'active' => $this->allianceConfig->isEnabled(),
                     'title' => $this->allianceConfig->getTitle(),
                     'redirectUrl' => $this->alliancePayment->getOrderPlaceRedirectUrl(),
                 ]

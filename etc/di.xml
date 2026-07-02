@@ -56,9 +56,66 @@
             </argument>
         </arguments>
     </type>
-    <type name="Magento\Sales\Model\Service\CreditmemoService">
-        <plugin name="alliance_create_open_refund"
-                type="Alliance\AlliancePay\Plugin\CreateOpenRefund"
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="alliance_restrict_a2a_creditmemo"
+                type="Alliance\AlliancePay\Plugin\RestrictA2ACreditmemo"
                 sortOrder="10"/>
     </type>
+
+    <virtualType name="AlliancePayGatewayConfig"
+                 type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">
+                Alliance\AlliancePay\Model\Payment\AlliancePayment::PAYMENT_METHOD_CODE
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePayConfigValueHandler"
+                 type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AlliancePayGatewayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePayValueHandlerPool"
+                 type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AlliancePayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePayCommandPool"
+                 type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="initialize" xsi:type="string">
+                    Alliance\AlliancePay\Model\Payment\Command\InitializeCommand
+                </item>
+                <item name="authorize" xsi:type="string">
+                    Alliance\AlliancePay\Model\Payment\Command\AuthorizeCommand
+                </item>
+                <item name="capture" xsi:type="string">
+                    Alliance\AlliancePay\Model\Payment\Command\CaptureCommand
+                </item>
+                <item name="refund" xsi:type="string">
+                    Alliance\AlliancePay\Model\Payment\Command\RefundCommand
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">
+                Alliance\AlliancePay\Model\Payment\AlliancePayment::PAYMENT_METHOD_CODE
+            </argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AlliancePayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AlliancePayCommandPool</argument>
+        </arguments>
+    </virtualType>
 </config>

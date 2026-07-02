@@ -8,7 +8,7 @@
     <default>
         <payment>
             <alliance_pay>
-                <model>Alliance\AlliancePay\Model\Payment\AlliancePayment</model>
+                <model>AlliancePayFacade</model>
                 <title>Alliance Pay</title>
                 <active>1</active>
                 <allowspecific>0</allowspecific>

@@ -1,6 +1,6 @@
 {
     "name": "alliance/module-alliance-pay",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "Alliance Bank payment method trough the Hosted Payment Page.",
     "type": "magento2-module",
     "require": {
