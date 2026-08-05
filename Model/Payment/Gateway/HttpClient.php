@@ -39,6 +39,7 @@ class HttpClient implements GatewayClientInterface
     private const ENDPOINT_CREATE_ORDER = '/ecom/execute_request/hpp/v1/create-order';
     private const ENDPOINT_OPERATIONS = '/ecom/execute_request/hpp/v1/operations';
     private const ENDPOINT_REFUND = '/ecom/execute_request/payments/v3/refund';
+    private const ENDPOINT_COMPLETION = '/ecom/execute_request/payments/v1/completion';
     private const ENDPOINT_AUTHORIZE = '/api-gateway/authorize_virtual_device';
     private const MAX_AUTH_ATTEMPTS = 3;
     private int $authCounter = 0;
@@ -74,7 +75,7 @@ class HttpClient implements GatewayClientInterface
 
             return [
                 'success' => false,
-                'message' => $e->getResponse()->getReasonPhrase(),
+                'message' => $e->getResponse()?->getReasonPhrase() ?? $e->getMessage(),
             ];
         }
     }
@@ -99,7 +100,7 @@ class HttpClient implements GatewayClientInterface
 
             return [
                 'success' => false,
-                'message' => $e->getResponse()->getReasonPhrase(),
+                'message' => $e->getResponse()?->getReasonPhrase() ?? $e->getMessage(),
             ];
         }
     }
@@ -141,13 +142,60 @@ class HttpClient implements GatewayClientInterface
 
             return [
                 'success' => false,
-                'message' => $e->getResponse()->getReasonPhrase(),
+                'message' => $e->getResponse()?->getReasonPhrase() ?? $e->getMessage(),
             ];
         }
 
         return [
             'success' => false,
             'message' => __('Failed to refund order.'),
+        ];
+    }
+
+    /**
+     * @param array $completionData
+     * @return array
+     * @throws AlreadyExistsException
+     * @throws TokenException
+     */
+    public function completion(array $completionData): array
+    {
+        try {
+            $serverPublicKey = $this->serializer->unserialize($this->sensitiveDataManager->getPublicKey());
+            $encryptedData = $this->jweEncryptionService->encrypt(
+                $completionData,
+                $serverPublicKey
+            );
+            $response = $this->sendRequest(
+                self::METHOD_POST,
+                self::ENDPOINT_COMPLETION,
+                $encryptedData,
+                self::REQUEST_CONTENT_TYPE_TEXT
+            );
+            $decodedResponse = $this->serializer->unserialize($response->getBody()->getContents());
+
+            if (isset($decodedResponse['jwe'])) {
+                $decryptedResponse = $this->jweEncryptionService->decrypt(
+                    $this->sensitiveDataManager->getAuthorizationKey(),
+                    $decodedResponse['jwe']
+                );
+
+                if (!empty($decryptedResponse)) {
+                    return $decryptedResponse;
+                }
+            }
+        } catch (GuzzleException $e) {
+            $this->logger->error('Completion failed: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => $e->getResponse()?->getReasonPhrase() ?? $e->getMessage(),
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => __('Failed to complete PREAUTH order.'),
         ];
     }
 

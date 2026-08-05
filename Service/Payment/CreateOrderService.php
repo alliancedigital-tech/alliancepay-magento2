@@ -16,6 +16,7 @@ use Alliance\AlliancePay\Api\Data\AllianceOrderInterfaceFactory;
 use Alliance\AlliancePay\Logger\Logger;
 use Alliance\AlliancePay\Model\Config\AllianceConfig;
 use Alliance\AlliancePay\Model\Config\CountryCode\CountryCodeProvider;
+use Alliance\AlliancePay\Model\Config\Source\PaymentType;
 use Alliance\AlliancePay\Model\Payment\AlliancePayment;
 use Alliance\AlliancePay\Service\Payment\Service\ServiceAbstract;
 use Exception;
@@ -25,7 +26,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 /**
  * Class CreateOrderService.
@@ -45,6 +48,8 @@ class CreateOrderService extends ServiceAbstract
         private readonly ConvertDataServiceInterface $convertDataService,
         private readonly CountryCodeProvider $countryCodeProvider,
         private readonly CustomerDataValidatorInterface $customerDataValidator,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly TimezoneInterface $timezone,
         private Logger $logger
     ) {}
 
@@ -88,7 +93,25 @@ class CreateOrderService extends ServiceAbstract
                     );
 
                     $allianceOrder->setOrderId($order->getId());
+                    $isPreAuth = $hppOrderData['hppPayType'] === PaymentType::PREAUTH_PAYMENT_TYPE;
+
+                    if ($isPreAuth) {
+                        $coinAmount = $this->prepareCoinAmount((float) $order->getGrandTotal());
+                        $allianceOrder->setOriginalAuthorizedAmount($coinAmount);
+                    }
+
                     $this->allianceOrderRepository->save($allianceOrder);
+
+                    if ($isPreAuth) {
+                        $preAuthStatus = $this->allianceConfig->getPreAuthOrderStatus();
+                        if ($preAuthStatus) {
+                            $order->setStatus($preAuthStatus);
+                            $order->addCommentToStatusHistory(
+                                __('Order placed with PREAUTH payment. Awaiting bank authorization.')
+                            );
+                            $this->orderRepository->save($order);
+                        }
+                    }
                 }
 
                 return $resultRequest;
@@ -131,7 +154,31 @@ class CreateOrderService extends ServiceAbstract
             $data['merchantComment'] = 'Payment for order #' . ($order->getIncrementId() ?? '');
         }
 
+        if ($data['hppPayType'] === AlliancePayment::HPP_PAY_TYPE_PREAUTH) {
+            $data['preAuthExpDate'] = $this->calculatePreAuthExpDate();
+        }
+
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    private function calculatePreAuthExpDate(): string
+    {
+        $expDateConfig = $this->allianceConfig->getPreAuthExpDate() ?? '2h';
+
+        preg_match('/^(\d+)(h|d)$/', $expDateConfig, $matches);
+        $value = isset($matches[1]) ? (int) $matches[1] : 2;
+        $unit  = $matches[2] ?? 'h';
+
+        $seconds = ($unit === 'h') ? $value * 3600 : $value * 86400;
+        $seconds += 30;
+
+        $date = $this->timezone->date();
+        $date->modify('+' . $seconds . ' seconds');
+
+        return $date->format('Y-m-d H:i:s.00P');
     }
 
     /**

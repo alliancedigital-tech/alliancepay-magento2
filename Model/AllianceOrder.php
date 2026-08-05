@@ -314,4 +314,21 @@ class AllianceOrder extends AbstractModel implements AllianceOrderInterface
     {
         $this->setData(self::EXPIRED_ORDER_DATE, $expiredOrderDate);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getOriginalAuthorizedAmount(): ?int
+    {
+        $value = $this->getData(self::ORIGINAL_AUTHORIZED_AMOUNT);
+        return $value !== null ? (int) $value : null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setOriginalAuthorizedAmount(?int $amount): void
+    {
+        $this->setData(self::ORIGINAL_AUTHORIZED_AMOUNT, $amount);
+    }
 }

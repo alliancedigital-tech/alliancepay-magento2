@@ -18,8 +18,11 @@ class AlliancePayment
     public const PAYMENT_METHODS = ['CARD', 'APPLE_PAY', 'GOOGLE_PAY'];
     public const HPP_PAY_TYPE_PURCHASE = 'PURCHASE';
     public const HPP_PAY_TYPE_A2A = 'A2A';
+    public const HPP_PAY_TYPE_PREAUTH = 'PREAUTH';
     public const OPERATION_TYPE_PURCHASE = 'PURCHASE';
     public const OPERATION_TYPE_A2A = 'ACCOUNT_2_ACCOUNT';
+    public const OPERATION_TYPE_PREAUTH = 'PREAUTH';
+    public const OPERATION_TYPE_COMPLETION = 'COMPLETION';
     public const DIRECT_TYPE_BANK_LINK = 'BANK_LINK';
     public const PRIORITY_BANK_CODE = 'ALL_BANKS';
 

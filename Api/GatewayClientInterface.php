@@ -35,4 +35,10 @@ interface GatewayClientInterface
      * @return array
      */
     public function authorize(string $serviceCode): array;
+
+    /**
+     * @param array $completionData
+     * @return array
+     */
+    public function completion(array $completionData): array;
 }

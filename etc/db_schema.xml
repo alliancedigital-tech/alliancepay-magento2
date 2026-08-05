@@ -40,6 +40,8 @@
                 comment="Callback Data"/>
         <column xsi:type="datetime" name="expired_order_date" nullable="false"
                 comment="Expired Order Date"/>
+        <column xsi:type="int" name="original_authorized_amount" unsigned="true" nullable="true"
+                comment="Original Authorized Amount in coins (for PREAUTH)"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>

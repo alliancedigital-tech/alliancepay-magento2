@@ -78,6 +78,19 @@
                     <label>Payment Type</label>
                     <source_model>Alliance\AlliancePay\Model\Config\Source\PaymentType</source_model>
                 </field>
+                <field id="pre_auth_exp_date"
+                       translate="label"
+                       type="select"
+                       sortOrder="75"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>PreAuth Expiration Period</label>
+                    <source_model>Alliance\AlliancePay\Model\Config\Source\PreAuthExpDate</source_model>
+                    <depends>
+                        <field id="payment_type">PREAUTH</field>
+                    </depends>
+                </field>
                 <field id="service_code"
                        translate="label"
                        type="text"
@@ -128,10 +141,30 @@
                     <label>Refresh Token</label>
                     <frontend_model>Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\DisabledField</frontend_model>
                 </field>
-                <field id="success_order_status"
+                <field id="pre_auth_order_status"
                        translate="label"
                        type="select"
                        sortOrder="80"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>PreAuth Created Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="pre_auth_capture_success_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="81"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>PreAuth Capture Success Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="success_order_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="82"
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="1">
@@ -141,7 +174,7 @@
                 <field id="failed_order_status"
                        translate="label"
                        type="select"
-                       sortOrder="90"
+                       sortOrder="83"
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="1">
@@ -151,7 +184,7 @@
                 <field id="success_refund_order_status"
                        translate="label"
                        type="select"
-                       sortOrder="100"
+                       sortOrder="84"
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="1">
@@ -161,7 +194,7 @@
                 <field id="failed_refund_order_status"
                        translate="label"
                        type="select"
-                       sortOrder="110"
+                       sortOrder="85"
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="1">

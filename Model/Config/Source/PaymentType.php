@@ -16,6 +16,8 @@ class PaymentType implements OptionSourceInterface
 {
     public const DEFAULT_PAYMENT_TYPE = 'PURCHASE';
 
+    public const PREAUTH_PAYMENT_TYPE = 'PREAUTH';
+
     /**
      * @inheritDoc
      */
@@ -24,6 +26,7 @@ class PaymentType implements OptionSourceInterface
         return [
             ['value' => 'PURCHASE', 'label' => 'PURCHASE'],
             ['value' => 'A2A', 'label' => 'A2A'],
+            ['value' => 'PREAUTH', 'label' => 'PREAUTH'],
         ];
     }
 }

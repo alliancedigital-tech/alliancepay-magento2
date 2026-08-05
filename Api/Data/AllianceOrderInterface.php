@@ -29,6 +29,7 @@ interface AllianceOrderInterface
     public const IS_CALLBACK_RETURNED = 'is_callback_returned';
     public const CALLBACK_DATA = 'callback_data';
     public const EXPIRED_ORDER_DATE = 'expired_order_date';
+    public const ORIGINAL_AUTHORIZED_AMOUNT = 'original_authorized_amount';
     public const OPERATION_STATUS = 'status';
     public const OPERATION_CREATION_TIME = 'creation_date_time';
     public const OPERATION_TYPE = 'type';
@@ -214,4 +215,15 @@ interface AllianceOrderInterface
      * @return void
      */
     public function setExpiredOrderDate(?string $expiredOrderDate): void;
+
+    /**
+     * @return int|null
+     */
+    public function getOriginalAuthorizedAmount(): ?int;
+
+    /**
+     * @param int|null $amount
+     * @return void
+     */
+    public function setOriginalAuthorizedAmount(?int $amount): void;
 }

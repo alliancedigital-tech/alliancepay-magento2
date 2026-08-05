@@ -27,6 +27,9 @@ class AllianceConfig
     public const XML_PATH_ALLIANCE_PAY_SUCCESS_REFUND_ORDER_STATUS = 'payment/alliance_payment_config/success_refund_order_status';
     public const XML_PATH_ALLIANCE_PAY_FAILED_REFUND_ORDER_STATUS = 'payment/alliance_payment_config/failed_refund_order_status';
     public const XML_PATH_ALLIANCE_PAY_IS_LOGS_ENABLED = 'payment/alliance_payment_config/is_logs_enabled';
+    public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_EXP_DATE = 'payment/alliance_payment_config/pre_auth_exp_date';
+    public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_ORDER_STATUS = 'payment/alliance_payment_config/pre_auth_order_status';
+    public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_CAPTURE_SUCCESS_STATUS = 'payment/alliance_payment_config/pre_auth_capture_success_status';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
@@ -119,5 +122,29 @@ class AllianceConfig
     public function isLogsEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ALLIANCE_PAY_IS_LOGS_ENABLED);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreAuthExpDate(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_PRE_AUTH_EXP_DATE);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreAuthOrderStatus(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_PRE_AUTH_ORDER_STATUS);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreAuthCaptureSuccessStatus(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_PRE_AUTH_CAPTURE_SUCCESS_STATUS);
     }
 }
