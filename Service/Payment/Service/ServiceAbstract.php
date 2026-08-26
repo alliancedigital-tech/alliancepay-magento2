@@ -7,6 +7,9 @@ declare(strict_types=1);
 
 namespace Alliance\AlliancePay\Service\Payment\Service;
 
+use Alliance\AlliancePay\Model\Payment\AlliancePayment;
+use Magento\Framework\Exception\LocalizedException;
+
 /**
  * Class ServiceAbstract.
  */
@@ -31,5 +34,21 @@ abstract class ServiceAbstract
         }
 
         return (int) $amount;
+    }
+
+    /**
+     * @param string $code
+     * @return int
+     * @throws LocalizedException
+     */
+    public function getCurrencyCode(string $code): int
+    {
+        if (!array_key_exists($code, AlliancePayment::CURRENCY_CODE_MAP)) {
+            throw new LocalizedException(
+                __('You cannot place an order with this currency: %1.', $code)
+            );
+        }
+
+        return AlliancePayment::CURRENCY_CODE_MAP[$code];
     }
 }

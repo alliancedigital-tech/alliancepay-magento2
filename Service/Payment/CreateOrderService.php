@@ -100,6 +100,10 @@ class CreateOrderService extends ServiceAbstract
                         $allianceOrder->setOriginalAuthorizedAmount($coinAmount);
                     }
 
+                    if (isset($hppOrderData['currencyCode'])) {
+                        $allianceOrder->setCurrencyCode((int) $hppOrderData['currencyCode']);
+                    }
+
                     $this->allianceOrderRepository->save($allianceOrder);
 
                     if ($isPreAuth) {
@@ -156,6 +160,12 @@ class CreateOrderService extends ServiceAbstract
 
         if ($data['hppPayType'] === AlliancePayment::HPP_PAY_TYPE_PREAUTH) {
             $data['preAuthExpDate'] = $this->calculatePreAuthExpDate();
+        }
+
+        if ($data['hppPayType'] === AlliancePayment::HPP_PAY_TYPE_PURCHASE
+            || $data['hppPayType'] === AlliancePayment::HPP_PAY_TYPE_PREAUTH
+        ) {
+            $data['currencyCode'] = $this->getCurrencyCode($order->getOrderCurrencyCode());
         }
 
         return $data;

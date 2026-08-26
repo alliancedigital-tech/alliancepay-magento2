@@ -55,7 +55,13 @@ class PreAuthCaptureService extends ServiceAbstract
 
         $this->validateAmount($order, $allianceOrder);
 
-        $coinAmount = $this->prepareCoinAmount((float)$order->getGrandTotal());
+        $conversionRate = $allianceOrder->getConversionRate();
+        if ($conversionRate !== null && $conversionRate > 0) {
+            $amountInUah = (float)$order->getGrandTotal() * $conversionRate;
+            $coinAmount = $this->prepareCoinAmount($amountInUah);
+        } else {
+            $coinAmount = $this->prepareCoinAmount((float)$order->getGrandTotal());
+        }
         $now = $this->timezone->date();
 
         $payload = [
@@ -161,8 +167,16 @@ class PreAuthCaptureService extends ServiceAbstract
             ));
         }
 
-        $currentCoinAmount = $this->prepareCoinAmount((float)$order->getGrandTotal());
-        $diffPercent = abs($currentCoinAmount - $originalAmount) / $originalAmount * 100;
+        $conversionRate = $allianceOrder->getConversionRate();
+        if ($conversionRate !== null && $conversionRate > 0) {
+            $originalAmountInUah = (int) round(($originalAmount / 100) * $conversionRate * 100);
+            $currentAmountInUah  = (float)$order->getGrandTotal() * $conversionRate;
+            $currentCoinAmount   = $this->prepareCoinAmount($currentAmountInUah);
+            $diffPercent = abs($currentCoinAmount - $originalAmountInUah) / $originalAmountInUah * 100;
+        } else {
+            $currentCoinAmount = $this->prepareCoinAmount((float)$order->getGrandTotal());
+            $diffPercent = abs($currentCoinAmount - $originalAmount) / $originalAmount * 100;
+        }
 
         if ($diffPercent > 20) {
             throw new LocalizedException(__(

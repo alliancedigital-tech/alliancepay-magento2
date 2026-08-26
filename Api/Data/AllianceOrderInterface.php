@@ -30,6 +30,8 @@ interface AllianceOrderInterface
     public const CALLBACK_DATA = 'callback_data';
     public const EXPIRED_ORDER_DATE = 'expired_order_date';
     public const ORIGINAL_AUTHORIZED_AMOUNT = 'original_authorized_amount';
+    public const CURRENCY_CODE = 'currency_code';
+    public const CONVERSION_RATE = 'conversion_rate';
     public const OPERATION_STATUS = 'status';
     public const OPERATION_CREATION_TIME = 'creation_date_time';
     public const OPERATION_TYPE = 'type';
@@ -226,4 +228,26 @@ interface AllianceOrderInterface
      * @return void
      */
     public function setOriginalAuthorizedAmount(?int $amount): void;
+
+    /**
+     * @return int|null
+     */
+    public function getCurrencyCode(): ?int;
+
+    /**
+     * @param int|null $code
+     * @return void
+     */
+    public function setCurrencyCode(?int $code): void;
+
+    /**
+     * @return float|null
+     */
+    public function getConversionRate(): ?float;
+
+    /**
+     * @param float|null $rate
+     * @return void
+     */
+    public function setConversionRate(?float $rate): void;
 }

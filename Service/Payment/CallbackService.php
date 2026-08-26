@@ -140,6 +140,11 @@ class CallbackService
             )
         );
 
+        $conversionRate = $this->extractConversionRateFromPreauthOrPurchase($rawCallbackData);
+        if ($conversionRate !== null) {
+            $allianceOrder->setConversionRate($conversionRate);
+        }
+
         $this->allianceOrderRepository->save($allianceOrder);
         $this->updateRefunds($order, $callbackData);
     }
@@ -358,5 +363,27 @@ class CallbackService
         }
 
         return $hasPreauthOperation && !$hasCompletionOperation;
+    }
+
+    /**
+     * @param array $rawCallbackData
+     * @return float|null
+     */
+    private function extractConversionRateFromPreauthOrPurchase(array $rawCallbackData): ?float
+    {
+        $operations = $this->getOperationsFromCallbackData($rawCallbackData);
+
+        foreach ($operations as $operation) {
+            if (in_array(
+                ($operation['type'] ?? ''),
+                [AlliancePayment::OPERATION_TYPE_PREAUTH, AlliancePayment::OPERATION_TYPE_PURCHASE],
+                )
+                && isset($operation['conversionRate'])
+            ) {
+                return (float) $operation['conversionRate'];
+            }
+        }
+
+        return null;
     }
 }

@@ -26,6 +26,12 @@ class AlliancePayment
     public const DIRECT_TYPE_BANK_LINK = 'BANK_LINK';
     public const PRIORITY_BANK_CODE = 'ALL_BANKS';
 
+    public const CURRENCY_CODE_MAP = [
+        'UAH' => 980,
+        'USD' => 840,
+        'EUR' => 978,
+    ];
+
     public function __construct(
         private readonly UrlInterface $urlBuilder
     ) {}

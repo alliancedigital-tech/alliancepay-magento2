@@ -77,19 +77,7 @@
                        showInStore="0">
                     <label>Payment Type</label>
                     <source_model>Alliance\AlliancePay\Model\Config\Source\PaymentType</source_model>
-                </field>
-                <field id="pre_auth_exp_date"
-                       translate="label"
-                       type="select"
-                       sortOrder="75"
-                       showInDefault="1"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>PreAuth Expiration Period</label>
-                    <source_model>Alliance\AlliancePay\Model\Config\Source\PreAuthExpDate</source_model>
-                    <depends>
-                        <field id="payment_type">PREAUTH</field>
-                    </depends>
+                    <comment><![CDATA[<strong style="color: red;">Note:</strong> A2A payment type supports <strong style="color: red;">UAH only</strong>. If the store base currency is not UAH, A2A payments will not work correctly.]]></comment>
                 </field>
                 <field id="service_code"
                        translate="label"
@@ -141,6 +129,19 @@
                     <label>Refresh Token</label>
                     <frontend_model>Alliance\AlliancePay\Block\Adminhtml\System\Config\Form\Field\DisabledField</frontend_model>
                 </field>
+                <field id="pre_auth_exp_date"
+                       translate="label"
+                       type="select"
+                       sortOrder="75"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>PreAuth Expiration Period</label>
+                    <source_model>Alliance\AlliancePay\Model\Config\Source\PreAuthExpDate</source_model>
+                    <depends>
+                        <field id="payment_type">PREAUTH</field>
+                    </depends>
+                </field>
                 <field id="pre_auth_order_status"
                        translate="label"
                        type="select"
@@ -150,6 +151,9 @@
                        showInStore="1">
                     <label>PreAuth Created Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <depends>
+                        <field id="payment_type">PREAUTH</field>
+                    </depends>
                 </field>
                 <field id="pre_auth_capture_success_status"
                        translate="label"
@@ -160,6 +164,9 @@
                        showInStore="1">
                     <label>PreAuth Capture Success Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <depends>
+                        <field id="payment_type">PREAUTH</field>
+                    </depends>
                 </field>
                 <field id="success_order_status"
                        translate="label"

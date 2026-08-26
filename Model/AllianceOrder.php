@@ -331,4 +331,38 @@ class AllianceOrder extends AbstractModel implements AllianceOrderInterface
     {
         $this->setData(self::ORIGINAL_AUTHORIZED_AMOUNT, $amount);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrencyCode(): ?int
+    {
+        $value = $this->getData(self::CURRENCY_CODE);
+        return $value !== null ? (int) $value : null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setCurrencyCode(?int $code): void
+    {
+        $this->setData(self::CURRENCY_CODE, $code);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getConversionRate(): ?float
+    {
+        $value = $this->getData(self::CONVERSION_RATE);
+        return $value !== null ? (float) $value : null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setConversionRate(?float $rate): void
+    {
+        $this->setData(self::CONVERSION_RATE, $rate);
+    }
 }

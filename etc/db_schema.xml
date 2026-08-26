@@ -42,6 +42,10 @@
                 comment="Expired Order Date"/>
         <column xsi:type="int" name="original_authorized_amount" unsigned="true" nullable="true"
                 comment="Original Authorized Amount in coins (for PREAUTH)"/>
+        <column xsi:type="smallint" name="currency_code" unsigned="true" nullable="true"
+                comment="Currency ISO 4217 numeric code (980=UAH, 840=USD, 978=EUR)"/>
+        <column xsi:type="decimal" name="conversion_rate" scale="6" precision="15" nullable="true"
+                comment="Currency conversion rate to UAH from PREAUTH callback"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
