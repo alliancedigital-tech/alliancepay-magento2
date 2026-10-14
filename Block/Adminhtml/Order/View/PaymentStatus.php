@@ -70,6 +70,7 @@ class PaymentStatus extends Template
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function getOperations(): array
     {

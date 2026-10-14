@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 
 declare(strict_types=1);
@@ -29,12 +29,6 @@ interface GatewayClientInterface
      * @return array
      */
     public function refund(array $refundData): array;
-
-    /**
-     * @param string $serviceCode
-     * @return array
-     */
-    public function authorize(string $serviceCode): array;
 
     /**
      * @param array $completionData

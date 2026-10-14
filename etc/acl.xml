@@ -23,6 +23,23 @@
                     <resource id="Alliance_AlliancePay::check_payment_status" title="Check Bank Payment Status"/>
                     <resource id="Alliance_AlliancePay::process_refund" title="Process Bank Refund"/>
                 </resource>
+                <resource id="Alliance_AlliancePay::subscriptions" title="Subscriptions" sortOrder="50">
+                    <resource id="Alliance_AlliancePay::plan_template" title="Plan Templates"/>
+                    <resource id="Alliance_AlliancePay::subscription_plan" title="Subscription Plans">
+                        <resource id="Alliance_AlliancePay::plan_reprice" title="Reprice Subscription Plan"/>
+                        <resource id="Alliance_AlliancePay::plan_replace_new_customers"
+                                  title="Replace Plan For New Customers"/>
+                        <resource id="Alliance_AlliancePay::plan_archive" title="Archive Subscription Plan"/>
+                    </resource>
+                    <resource id="Alliance_AlliancePay::subscription" title="Subscriptions">
+                        <resource id="Alliance_AlliancePay::subscription_cancel" title="Cancel Subscription"/>
+                    </resource>
+                    <resource id="Alliance_AlliancePay::scheduled_payment" title="Scheduled Payments">
+                        <resource id="Alliance_AlliancePay::scheduled_payment_run_now"
+                                  title="Run Scheduled Payment Now"/>
+                    </resource>
+                    <resource id="Alliance_AlliancePay::diagnostics" title="Subscription Diagnostics"/>
+                </resource>
             </resource>
         </resources>
     </acl>

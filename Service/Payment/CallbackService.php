@@ -30,6 +30,12 @@ use Magento\Sales\Model\Service\InvoiceService;
  */
 class CallbackService
 {
+    private const PURCHASE_OPERATION_TYPES = [
+        AlliancePayment::OPERATION_TYPE_PURCHASE,
+        AlliancePayment::OPERATION_TYPE_A2A,
+        AlliancePayment::OPERATION_TYPE_COMPLETION,
+    ];
+
     public function __construct(
         private AllianceOrderRepositoryInterface $allianceOrderRepository,
         private AllianceConfig $allianceConfig,
@@ -51,8 +57,6 @@ class CallbackService
     public function processCallback(array $callbackData): array
     {
         try {
-            $this->validateSignature($callbackData);
-
             if ($this->allianceConfig->isLogsEnabled()) {
                 $this->logger->info(
                     'Callback request data: ' . print_r($callbackData, true)
@@ -88,14 +92,6 @@ class CallbackService
     }
 
     /**
-     * @param array $callbackData
-     * @return void
-     */
-    private function validateSignature(array $callbackData): void
-    {
-    }
-
-    /**
      * @param OrderInterface $order
      * @param AllianceOrderInterface $allianceOrder
      * @param array $callbackData snake_case converted payload
@@ -112,7 +108,7 @@ class CallbackService
         ?string $previousCallbackData
     ): void {
         $status = $callbackData[AllianceOrderInterface::ORDER_STATUS] ?? AllianceOrderInterface::ORDER_STATUS_PENDING;
-        $isPreauthWithoutCompletion = $this->checkIfPreauthWithoutCompletion($callbackData);
+        $isPreauthWithoutCompletion = $this->checkIfPreauthWithoutCompletion($callbackData, $allianceOrder);
 
         if (!$isPreauthWithoutCompletion) {
             match ($status) {
@@ -120,6 +116,8 @@ class CallbackService
                 AllianceOrderInterface::ORDER_STATUS_FAIL => $this->markOrderAsFailed($order),
                 default => $this->logger->warning('Unknown callback status')
             };
+        } elseif ($status === AllianceOrderInterface::ORDER_STATUS_SUCCESS) {
+            $this->recordOperationId($order, $callbackData);
         }
 
         $this->dataObjectHelper->populateWithArray(
@@ -181,11 +179,12 @@ class CallbackService
      */
     private function markOrderAsSuccessful(OrderInterface $order, array $callbackData): void
     {
+        $operationId = $this->getOperationId($callbackData);
+
         if ($order->canInvoice()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
 
             if ($invoice) {
-                $operationId = $this->getOperationId($callbackData);
                 $invoice->register();
                 $invoice->setTransactionId($operationId);
                 $invoice->pay();
@@ -193,15 +192,56 @@ class CallbackService
                 $order->setState($this->allianceConfig->getSuccessOrderStatus());
                 $order->setStatus($this->allianceConfig->getSuccessOrderStatus());
                 $order->addCommentToStatusHistory(__('Payment successfully completed by bank'));
-                $order->getPayment()->setAdditionalInformation(
-                    AllianceOrderInterface::OPERATION_ID,
-                    $operationId
-                );
                 $order->setIsInProcess(true);
-                $this->orderRepository->save($order);
                 $order->addCommentToStatusHistory(__('Invoice successfully created.'));
             }
+        } elseif ($operationId !== '') {
+            $this->backfillOperationId($order, $operationId);
         }
+
+        if ($operationId !== '') {
+            $order->getPayment()->setAdditionalInformation(
+                AllianceOrderInterface::OPERATION_ID,
+                $operationId
+            );
+        }
+
+        $this->orderRepository->save($order);
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param string $operationId
+     * @return void
+     */
+    private function backfillOperationId(OrderInterface $order, string $operationId): void
+    {
+        $invoice = $order->getInvoiceCollection()->getFirstItem();
+
+        if ($invoice && $invoice->getId() && !$invoice->getTransactionId()) {
+            $invoice->setTransactionId($operationId);
+            $this->invoiceRepository->save($invoice);
+        }
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param array $callbackData
+     * @return void
+     */
+    private function recordOperationId(OrderInterface $order, array $callbackData): void
+    {
+        $operationId = $this->getOperationId($callbackData, null);
+
+        if ($operationId === '') {
+            return;
+        }
+
+        $order->getPayment()->setAdditionalInformation(
+            AllianceOrderInterface::OPERATION_ID,
+            $operationId
+        );
+        $this->orderRepository->save($order);
     }
 
     /**
@@ -270,16 +310,17 @@ class CallbackService
 
     /**
      * @param array $callbackData
+     * @param array|null $allowedTypes
      * @return string
      */
-    private function getOperationId(array $callbackData): string
+    private function getOperationId(array $callbackData, ?array $allowedTypes = self::PURCHASE_OPERATION_TYPES): string
     {
         $operations = $this->getOperationsFromCallbackData($callbackData);
 
         foreach ($operations as $operation) {
             $convertedOperation = $this->convertDataService->camelToSnakeArrayKeys($operation);
 
-            if ($this->isSuccessfulPurchaseOperation($convertedOperation)) {
+            if ($this->isSuccessfulOperation($convertedOperation, $allowedTypes)) {
                 return $convertedOperation[AllianceOrderInterface::OPERATION_ID];
             }
         }
@@ -289,23 +330,17 @@ class CallbackService
 
     /**
      * @param array $operation
+     * @param array|null $allowedTypes
      * @return bool
      */
-    private function isSuccessfulPurchaseOperation(array $operation): bool
+    private function isSuccessfulOperation(array $operation, ?array $allowedTypes): bool
     {
         return isset(
                 $operation[AllianceOrderInterface::OPERATION_ID],
                 $operation['type'],
                 $operation[AllianceOrderInterface::OPERATION_STATUS]
             )
-            && in_array(
-                $operation['type'],
-                [
-                    AlliancePayment::OPERATION_TYPE_PURCHASE,
-                    AlliancePayment::OPERATION_TYPE_A2A,
-                    AlliancePayment::OPERATION_TYPE_COMPLETION
-                ]
-            )
+            && ($allowedTypes === null || in_array($operation['type'], $allowedTypes, true))
             && $operation[AllianceOrderInterface::OPERATION_STATUS] === AllianceOrderInterface::ORDER_STATUS_SUCCESS;
     }
 
@@ -346,23 +381,24 @@ class CallbackService
 
     /**
      * @param array $callbackData
+     * @param AllianceOrderInterface $allianceOrder
      * @return bool
      */
-    private function checkIfPreauthWithoutCompletion(array $callbackData): bool
+    private function checkIfPreauthWithoutCompletion(array $callbackData, AllianceOrderInterface $allianceOrder): bool
     {
-        $hasPreauthOperation = false;
-        $hasCompletionOperation = false;
-        $operations = $this->getOperationsFromCallbackData($callbackData);
+        $hppPayType = $callbackData[AllianceOrderInterface::HPP_PAY_TYPE] ?? $allianceOrder->getHppPayType();
 
-        foreach ($operations as $operation) {
-            if ($operation['type'] === AlliancePayment::OPERATION_TYPE_PREAUTH) {
-                $hasPreauthOperation = true;
-            } elseif ($operation['type'] === AlliancePayment::OPERATION_TYPE_COMPLETION) {
-                $hasCompletionOperation = true;
+        if ($hppPayType !== AlliancePayment::HPP_PAY_TYPE_PREAUTH) {
+            return false;
+        }
+
+        foreach ($this->getOperationsFromCallbackData($callbackData) as $operation) {
+            if (($operation['type'] ?? null) === AlliancePayment::OPERATION_TYPE_COMPLETION) {
+                return false;
             }
         }
 
-        return $hasPreauthOperation && !$hasCompletionOperation;
+        return true;
     }
 
     /**

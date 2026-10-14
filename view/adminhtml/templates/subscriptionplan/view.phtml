@@ -1,0 +1,28 @@
+<?php /** @var Alliance\AlliancePay\Block\Adminhtml\SubscriptionPlan\View $block */
+$plan = $block->getPlan(); ?>
+<div class="fieldset">
+    <h4><?= __('Plan #%1', $plan->getEntityId()) ?></h4>
+    <table class="admin__table-secondary">
+        <tbody>
+        <tr><th><?= __('Name') ?></th><td><?= $block->escapeHtml($plan->getName()) ?></td></tr>
+        <tr><th><?= __('Provider Plan ID') ?></th><td><?= $block->escapeHtml($plan->getProviderPlanId()) ?></td></tr>
+        <tr><th><?= __('Product ID') ?></th><td><?= (int)$plan->getProductId() ?></td></tr>
+        <tr><th><?= __('Status') ?></th><td><?= $block->escapeHtml($plan->getStatus()) ?></td></tr>
+        <tr><th><?= __('Sync Status') ?></th><td><?= $block->escapeHtml($plan->getSyncStatus()) ?></td></tr>
+        <tr><th><?= __('Sync Error') ?></th><td><?= $block->escapeHtml($plan->getSyncError()) ?></td></tr>
+        <tr><th><?= __('Active') ?></th><td><?= $plan->isActive() ? __('Yes') : __('No') ?></td></tr>
+        <tr><th><?= __('Active Subscriptions') ?></th><td><?= (int)$plan->getActiveSubscriptionsCount() ?></td></tr>
+        <tr><th><?= __('Rules') ?></th><td><pre><?= $block->escapeHtml($block->getRulesJson()) ?></pre></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="fieldset">
+    <form action="<?= $block->getArchiveUrl() ?>" method="post">
+        <?= $block->getBlockHtml('formkey') ?>
+        <button class="action-secondary" type="submit"
+                onclick="return confirm('<?= __('Archive this plan on the provider side?') ?>')">
+            <?= __('Archive Plan') ?>
+        </button>
+    </form>
+</div>

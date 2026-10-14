@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,6 +11,8 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="alliance"
                       xsi:type="object">Alliance\AlliancePay\Model\Payment\Config\AlliancePayConfigProvider</item>
+                <item name="alliance_subscription"
+                      xsi:type="object">Alliance\AlliancePay\Model\Payment\Config\AlliancePaySubscriptionConfigProvider</item>
             </argument>
         </arguments>
     </type>

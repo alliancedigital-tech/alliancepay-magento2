@@ -1,0 +1,26 @@
+<?php /** @var Alliance\AlliancePay\Block\Adminhtml\Subscription\Diagnostics $block */
+$subscription = $block->getSubscription();
+$operations = $block->getFreshOperations(); ?>
+<div class="fieldset">
+    <h4><?= __('Subscription #%1', $subscription->getEntityId()) ?></h4>
+    <table class="admin__table-secondary">
+        <tbody>
+        <tr><th><?= __('Provider Order ID') ?></th><td><?= $block->escapeHtml($subscription->getProviderOrderId()) ?></td></tr>
+        <tr><th><?= __('Status') ?></th><td><?= $block->escapeHtml($subscription->getStatus()) ?></td></tr>
+        <tr><th><?= __('Order ID') ?></th><td><?= (int)$subscription->getOrderId() ?></td></tr>
+        <tr><th><?= __('Plan ID') ?></th><td><?= (int)$subscription->getPlanId() ?></td></tr>
+        <tr><th><?= __('Customer ID') ?></th><td><?= (int)$subscription->getCustomerId() ?></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="fieldset">
+    <h4><?= __('Fresh Provider Data') ?></h4>
+    <?php if ($block->hasProviderError()): ?>
+        <div class="message message-warning warning">
+            <?= __('Could not fetch fresh data from the provider: %1', $block->escapeHtml($operations['message'] ?? '')) ?>
+        </div>
+    <?php else: ?>
+        <pre><?= $block->escapeHtml(json_encode($operations, JSON_PRETTY_PRINT)) ?></pre>
+    <?php endif; ?>
+</div>

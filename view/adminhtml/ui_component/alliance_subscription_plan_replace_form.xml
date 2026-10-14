@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">alliance_subscription_plan_replace_form.alliance_subscription_plan_replace_form_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="Magento\Ui\Component\Form\Element\SubmitButton">
+                <label translate="true">Create Replacement Plan</label>
+            </button>
+        </buttons>
+        <namespace>alliance_subscription_plan_replace_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>alliance_subscription_plan_replace_form.alliance_subscription_plan_replace_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="alliance_subscription_plan_replace_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Alliance\AlliancePay\Model\SubscriptionPlanActionFormDataProvider</argument>
+            <argument name="name" xsi:type="string">alliance_subscription_plan_replace_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </argument>
+        <settings>
+            <submitUrl path="alliance_pay/subscriptionplan/replacefornewcustomers"/>
+        </settings>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">New Plan For New Customers Only</label>
+        </settings>
+        <field name="id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>id</dataScope>
+            </settings>
+        </field>
+        <field name="name" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">New Plan Name</label>
+                <dataScope>name</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="rules_fieldset" sortOrder="10">
+        <settings>
+            <label translate="true">New Rules</label>
+        </settings>
+        <container name="rules" component="Magento_Ui/js/dynamic-rows/dynamic-rows"
+                   template="Magento_Backend/dynamic-rows/grid">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="componentType" xsi:type="string">dynamicRows</item>
+                    <item name="dataScope" xsi:type="string"></item>
+                    <item name="recordTemplate" xsi:type="string">record</item>
+                    <item name="addButtonLabel" xsi:type="string" translate="true">Add Rule</item>
+                    <item name="deleteButtonLabel" xsi:type="string" translate="true">Remove</item>
+                    <item name="deleteProperty" xsi:type="boolean">false</item>
+                    <item name="dndConfig" xsi:type="array">
+                        <item name="enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Rule</item>
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                    </item>
+                </argument>
+                <field name="paymentNumberFrom" formElement="input" sortOrder="10">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Payment # From</label>
+                        <dataScope>paymentNumberFrom</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="paymentNumberTo" formElement="input" sortOrder="20">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Payment # To</label>
+                        <dataScope>paymentNumberTo</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="intervalValue" formElement="input" sortOrder="30">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Interval Value</label>
+                        <dataScope>intervalValue</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="intervalUnit" formElement="select" sortOrder="40">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Interval Unit</label>
+                        <dataScope>intervalUnit</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Alliance\AlliancePay\Model\Config\Source\IntervalUnit"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <field name="coinAmount" formElement="input" sortOrder="50">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Amount</label>
+                        <dataScope>coinAmount</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="currency" formElement="input" sortOrder="60">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="string">980</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Currency</label>
+                        <dataScope>currency</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <actionDelete template="Magento_Backend/dynamic-rows/cells/action-delete">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Actions</label>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </container>
+    </fieldset>
+</form>

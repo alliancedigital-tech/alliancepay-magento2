@@ -1,0 +1,36 @@
+<?php /** @var Alliance\AlliancePay\Block\Customer\SubscriptionList $block */ ?>
+<div class="block block-alliance-subscriptions">
+    <div class="block-title"><strong><?= __('My Subscriptions') ?></strong></div>
+    <div class="block-content">
+        <table class="data table table-order-items">
+            <thead>
+            <tr>
+                <th><?= __('Order') ?></th>
+                <th><?= __('Status') ?></th>
+                <th><?= __('Created') ?></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($block->getSubscriptions() as $subscription): ?>
+                <tr>
+                    <td><?= (int)$subscription->getOrderId() ?></td>
+                    <td><?= $block->escapeHtml($subscription->getStatus()) ?></td>
+                    <td><?= $block->escapeHtml($subscription->getCreatedAt()) ?></td>
+                    <td>
+                        <?php if ($subscription->getStatus() === \Alliance\AlliancePay\Api\Data\SubscriptionInterface::STATUS_ACTIVE): ?>
+                            <form action="<?= $block->getCancelUrl((int)$subscription->getEntityId()) ?>" method="post">
+                                <?= $block->getBlockHtml('formkey') ?>
+                                <button class="action cancel"
+                                        onclick="return confirm('<?= __('Are you sure you want to cancel this subscription?') ?>')">
+                                    <?= __('Cancel') ?>
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

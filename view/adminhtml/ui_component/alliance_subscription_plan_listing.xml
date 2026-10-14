@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_components.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">alliance_subscription_plan_listing.alliance_subscription_plan_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>alliance_subscription_plan_columns</spinner>
+        <deps>
+            <dep>alliance_subscription_plan_listing.alliance_subscription_plan_listing_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="add">
+                <url path="alliance_pay/subscriptionplan/new"/>
+                <class>primary</class>
+                <label translate="true">New Subscription Plan</label>
+            </button>
+        </buttons>
+    </settings>
+    <dataSource name="alliance_subscription_plan_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Alliance\AlliancePay\Model\SubscriptionPlanGridDataProvider</argument>
+            <argument name="name" xsi:type="string">alliance_subscription_plan_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <columns name="alliance_subscription_plan_columns">
+        <column name="entity_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="provider_plan_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Provider Plan ID</label>
+            </settings>
+        </column>
+        <column name="product_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Product ID</label>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="sync_status">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Sync Status</label>
+            </settings>
+        </column>
+        <column name="is_active" class="Magento\Ui\Component\Listing\Columns\Column">
+            <settings>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Active</label>
+            </settings>
+        </column>
+        <column name="active_subscriptions_count">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Active Subscriptions</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Alliance\AlliancePay\Ui\Component\Listing\Column\SubscriptionPlanActions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">alliance_plan_template_form.alliance_plan_template_form_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="*/*/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="save" class="Magento\Ui\Component\Form\Element\SubmitButton">
+                <label translate="true">Save Template</label>
+            </button>
+        </buttons>
+        <namespace>alliance_plan_template_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>alliance_plan_template_form.alliance_plan_template_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="alliance_plan_template_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Alliance\AlliancePay\Model\PlanTemplateDataProvider</argument>
+            <argument name="name" xsi:type="string">alliance_plan_template_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </argument>
+        <settings>
+            <submitUrl path="alliance_pay/plantemplate/save"/>
+        </settings>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General</label>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>entity_id</dataScope>
+            </settings>
+        </field>
+        <field name="code" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Code</label>
+                <dataScope>code</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="name" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="category_indicator" formElement="input" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Category Indicator</label>
+                <dataScope>category_indicator</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="rules_template_fieldset" sortOrder="50">
+        <settings>
+            <label translate="true">Rules Template</label>
+        </settings>
+        <container name="rules_template" component="Magento_Ui/js/dynamic-rows/dynamic-rows"
+                   template="Magento_Backend/dynamic-rows/grid">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="componentType" xsi:type="string">dynamicRows</item>
+                    <item name="dataScope" xsi:type="string"></item>
+                    <item name="recordTemplate" xsi:type="string">record</item>
+                    <item name="addButtonLabel" xsi:type="string" translate="true">Add Rule</item>
+                    <item name="deleteButtonLabel" xsi:type="string" translate="true">Remove</item>
+                    <item name="deleteProperty" xsi:type="boolean">false</item>
+                    <item name="dndConfig" xsi:type="array">
+                        <item name="enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Rule</item>
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                    </item>
+                </argument>
+                <field name="paymentNumberFrom" formElement="input" sortOrder="10">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Payment # From</label>
+                        <dataScope>paymentNumberFrom</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="paymentNumberTo" formElement="input" sortOrder="20">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Payment # To</label>
+                        <dataScope>paymentNumberTo</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="intervalValue" formElement="input" sortOrder="30">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Interval Value</label>
+                        <dataScope>intervalValue</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="intervalUnit" formElement="select" sortOrder="40">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Interval Unit</label>
+                        <dataScope>intervalUnit</dataScope>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Alliance\AlliancePay\Model\Config\Source\IntervalUnit"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <actionDelete template="Magento_Backend/dynamic-rows/cells/action-delete">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Actions</label>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </container>
+    </fieldset>
+</form>

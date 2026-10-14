@@ -10,6 +10,9 @@
         <method name="alliance_pay">
             <allow_multiple_address>1</allow_multiple_address>
         </method>
+        <method name="alliance_pay_subscription">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
     <groups>
         <group id="alliance">

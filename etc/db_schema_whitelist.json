@@ -1,0 +1,233 @@
+{
+    "alliance_checkout_integration_order": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "merchant_request_id": true,
+            "hpp_order_id": true,
+            "merchant_id": true,
+            "coin_amount": true,
+            "hpp_pay_type": true,
+            "order_status": true,
+            "payment_methods": true,
+            "create_date": true,
+            "updated_at": true,
+            "operation_id": true,
+            "transaction_type": true,
+            "ecom_order_id": true,
+            "is_callback_returned": true,
+            "callback_data": true,
+            "expired_order_date": true,
+            "original_authorized_amount": true,
+            "currency_code": true,
+            "conversion_rate": true
+        },
+        "index": {
+            "ALLIANCE_CHECKOUT_INTEGRATION_ORDER_MERCHANT_REQUEST_ID": true,
+            "ALLIANCE_CHECKOUT_INTEGRATION_ORDER_HPP_ORDER_ID": true,
+            "ALLIANCE_CHECKOUT_INTEGRATION_ORDER_MERCHANT_ID": true,
+            "ALLIANCE_CHECKOUT_INTEGRATION_ORDER_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "alliance_integration_order_refund": {
+        "column": {
+            "refund_id": true,
+            "order_id": true,
+            "type": true,
+            "rrn": true,
+            "purpose": true,
+            "comment": true,
+            "coin_amount": true,
+            "merchant_id": true,
+            "operation_id": true,
+            "ecom_operation_id": true,
+            "merchant_name": true,
+            "approval_code": true,
+            "status": true,
+            "transaction_type": true,
+            "merchant_request_id": true,
+            "transaction_currency": true,
+            "merchant_commission": true,
+            "create_date_time": true,
+            "modification_date_time": true,
+            "action_code": true,
+            "response_code": true,
+            "description": true,
+            "processing_merchant_id": true,
+            "processing_terminal_id": true,
+            "transaction_response_info": true,
+            "bank_code": true,
+            "payment_system": true,
+            "product_type": true,
+            "notification_url": true,
+            "payment_service_type": true,
+            "notification_encryption": true,
+            "original_operation_id": true,
+            "original_coin_amount": true,
+            "original_ecom_operation_id": true,
+            "rrn_original": true
+        },
+        "index": {
+            "ALLIANCE_INTEGRATION_ORDER_REFUND_MERCHANT_REQUEST_ID": true,
+            "ALLIANCE_INTEGRATION_ORDER_REFUND_MERCHANT_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "alliance_subscription_plan_template": {
+        "column": {
+            "entity_id": true,
+            "code": true,
+            "name": true,
+            "category_indicator": true,
+            "rules_template": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_CODE": true
+        }
+    },
+    "alliance_subscription_plan": {
+        "column": {
+            "entity_id": true,
+            "provider_plan_id": true,
+            "product_id": true,
+            "template_id": true,
+            "plan_key": true,
+            "is_active": true,
+            "active_subscriptions_count": true,
+            "sync_status": true,
+            "sync_error": true,
+            "version_id": true,
+            "merchant_id": true,
+            "name": true,
+            "description": true,
+            "status": true,
+            "category_indicator": true,
+            "rules": true,
+            "applies_from": true,
+            "applies_to": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "ALLIANCE_SUBSCRIPTION_PLAN_PRODUCT_ID": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_PROVIDER_PLAN_ID": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_PLAN_KEY": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "FK_6E5DDA5EED9AD2B1201FEB54CD7C9332": true
+        }
+    },
+    "alliance_subscription": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "plan_id": true,
+            "customer_id": true,
+            "rules_snapshot": true,
+            "provider_order_id": true,
+            "merchant_request_id": true,
+            "status": true,
+            "callback_data": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "ALLIANCE_SUBSCRIPTION_PLAN_ID": true,
+            "ALLIANCE_SUBSCRIPTION_CUSTOMER_ID": true,
+            "ALLIANCE_SUBSCRIPTION_ORDER_ID": true,
+            "ALLIANCE_SUBSCRIPTION_MERCHANT_REQUEST_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ALLIANCE_SUBSCRIPTION_PROVIDER_ORDER_ID": true,
+            "ALLIANCE_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "ALLIANCE_SUBSCRIPTION_PLAN_ID_ALLIANCE_SUBSCRIPTION_PLAN_ENTT_ID": true,
+            "ALLIANCE_SUBSCRIPTION_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true
+        }
+    },
+    "alliance_subscription_scheduled_payment": {
+        "column": {
+            "entity_id": true,
+            "subscription_id": true,
+            "provider_order_id": true,
+            "scheduled_payment_id": true,
+            "payment_number": true,
+            "status": true,
+            "scheduled_date": true,
+            "executed_at": true,
+            "operation_id": true,
+            "retry_count": true,
+            "amount_reconciliation_status": true,
+            "reconciliation_note": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "ALLIANCE_SUBSCRIPTION_SCHEDULED_PAYMENT_SUBSCRIPTION_ID": true,
+            "ALLIANCE_SUBSCRIPTION_SCHEDULED_PAYMENT_PROVIDER_ORDER_ID": true,
+            "ALLIANCE_SUBSCRIPTION_SCHEDULED_PAYMENT_SCHEDULED_PAYMENT_ID": true,
+            "IDX_59D90C20993340E778DF639B9518843F": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ALLIANCE_SUBSCRIPTION_SCHEDULED_PAYMENT_OPERATION_ID": true,
+            "FK_CCEF848E06FB4E9D4C3E6DB01669DA7C": true
+        }
+    },
+    "alliance_subscription_plan_version_history": {
+        "column": {
+            "entity_id": true,
+            "plan_id": true,
+            "old_version_id": true,
+            "new_version_id": true,
+            "old_rules": true,
+            "new_rules": true,
+            "applies_from": true,
+            "reason": true,
+            "created_by": true,
+            "created_at": true
+        },
+        "index": {
+            "ALLIANCE_SUBSCRIPTION_PLAN_VERSION_HISTORY_PLAN_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_8B9E4395088D0E26F0763A9C7E9663B1": true,
+            "FK_4FE838D9A179AD3E88D8ADE8E4761B1C": true
+        }
+    },
+    "alliance_subscription_audit_log": {
+        "column": {
+            "entity_id": true,
+            "action": true,
+            "plan_id": true,
+            "product_id": true,
+            "user_id": true,
+            "details": true,
+            "created_at": true
+        },
+        "index": {
+            "ALLIANCE_SUBSCRIPTION_AUDIT_LOG_PLAN_ID": true,
+            "ALLIANCE_SUBSCRIPTION_AUDIT_LOG_ACTION": true,
+            "ALLIANCE_SUBSCRIPTION_AUDIT_LOG_CREATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_28D03E0308090832C0626AE21EB477E3": true,
+            "ALLIANCE_SUBSCRIPTION_AUDIT_LOG_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "ALLIANCE_SUBSCRIPTION_AUDIT_LOG_USER_ID_ADMIN_USER_USER_ID": true
+        }
+    }
+}

@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2025 Alliance Dgtl. https://alb.ua/uk
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Alliance\AlliancePay\Api\GatewayClientInterface"
                 type="Alliance\AlliancePay\Model\Payment\Gateway\HttpClient" />
-    <preference for="Alliance\AlliancePay\Api\SensitiveDataManagerInterface"
-                type="Alliance\AlliancePay\Model\Config\SensitiveDataManager" />
     <preference for="Alliance\AlliancePay\Api\PaymentProcessorInterface"
                 type="Alliance\AlliancePay\Model\Payment\Processor\PaymentProcessor" />
     <preference for="Alliance\AlliancePay\Api\Data\AllianceOrderInterface"
@@ -28,6 +26,28 @@
                 type="Alliance\AlliancePay\Model\Refund" />
     <preference for="Alliance\AlliancePay\Api\CustomerDataValidatorInterface"
                 type="Alliance\AlliancePay\Model\Validator\CustomerDataValidator" />
+    <preference for="Alliance\AlliancePay\Api\ScheduledPaymentGatewayClientInterface"
+                type="Alliance\AlliancePay\Model\Payment\Gateway\ScheduledPaymentHttpClient" />
+    <preference for="Alliance\AlliancePay\Api\Data\PlanTemplateInterface"
+                type="Alliance\AlliancePay\Model\PlanTemplate" />
+    <preference for="Alliance\AlliancePay\Api\PlanTemplateRepositoryInterface"
+                type="Alliance\AlliancePay\Model\PlanTemplateRepository" />
+    <preference for="Alliance\AlliancePay\Api\Data\SubscriptionPlanInterface"
+                type="Alliance\AlliancePay\Model\SubscriptionPlan" />
+    <preference for="Alliance\AlliancePay\Api\SubscriptionPlanRepositoryInterface"
+                type="Alliance\AlliancePay\Model\SubscriptionPlanRepository" />
+    <preference for="Alliance\AlliancePay\Api\Data\SubscriptionInterface"
+                type="Alliance\AlliancePay\Model\Subscription" />
+    <preference for="Alliance\AlliancePay\Api\SubscriptionRepositoryInterface"
+                type="Alliance\AlliancePay\Model\SubscriptionRepository" />
+    <preference for="Alliance\AlliancePay\Api\Data\ScheduledPaymentInterface"
+                type="Alliance\AlliancePay\Model\ScheduledPayment" />
+    <preference for="Alliance\AlliancePay\Api\ScheduledPaymentRepositoryInterface"
+                type="Alliance\AlliancePay\Model\ScheduledPaymentRepository" />
+    <preference for="Alliance\AlliancePay\Api\Data\SubscriptionPlanVersionHistoryInterface"
+                type="Alliance\AlliancePay\Model\SubscriptionPlanVersionHistory" />
+    <preference for="Alliance\AlliancePay\Api\Data\SubscriptionAuditLogInterface"
+                type="Alliance\AlliancePay\Model\SubscriptionAuditLog" />
     <type name="Alliance\AlliancePay\Logger\Handler">
         <arguments>
             <argument name="fileName" xsi:type="string">/var/log/alliance_payment.log</argument>
@@ -44,7 +64,7 @@
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
             <argument name="sensitive" xsi:type="array">
-                <item name="payment/alliance_payment_config/authorization_key" xsi:type="string">1</item>
+                <item name="payment/alliance_payment_config/jws_private_key" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>
@@ -53,6 +73,8 @@
             <argument name="methodCodes" xsi:type="array">
                 <item name="alliance_pay"
                       xsi:type="const">Alliance\AlliancePay\Model\Payment\AlliancePayment::PAYMENT_METHOD_CODE</item>
+                <item name="alliance_pay_subscription"
+                      xsi:type="const">Alliance\AlliancePay\Model\Payment\AlliancePaySubscriptionPayment::PAYMENT_METHOD_CODE</item>
             </argument>
         </arguments>
     </type>
@@ -61,6 +83,63 @@
                 type="Alliance\AlliancePay\Plugin\RestrictA2ACreditmemo"
                 sortOrder="10"/>
     </type>
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="alliance_restrict_subscription_cart"
+                type="Alliance\AlliancePay\Plugin\Quote\RestrictSubscriptionCartPlugin"
+                sortOrder="10"/>
+    </type>
+    <type name="Magento\Payment\Model\Method\Adapter">
+        <plugin name="alliance_restrict_subscription_method_availability"
+                type="Alliance\AlliancePay\Plugin\Payment\RestrictSubscriptionMethodAvailabilityPlugin"
+                sortOrder="10"/>
+    </type>
+    <virtualType name="AlliancePaySubscriptionGatewayConfig"
+                 type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">
+                Alliance\AlliancePay\Model\Payment\AlliancePaySubscriptionPayment::PAYMENT_METHOD_CODE
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePaySubscriptionConfigValueHandler"
+                 type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AlliancePaySubscriptionGatewayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePaySubscriptionValueHandlerPool"
+                 type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AlliancePaySubscriptionConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePaySubscriptionCommandPool"
+                 type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="initialize" xsi:type="string">
+                    Alliance\AlliancePay\Model\Payment\Command\InitializeCommand
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlliancePaySubscriptionFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">
+                Alliance\AlliancePay\Model\Payment\AlliancePaySubscriptionPayment::PAYMENT_METHOD_CODE
+            </argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AlliancePaySubscriptionValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AlliancePaySubscriptionCommandPool</argument>
+        </arguments>
+    </virtualType>
 
     <virtualType name="AlliancePayGatewayConfig"
                  type="Magento\Payment\Gateway\Config\Config">

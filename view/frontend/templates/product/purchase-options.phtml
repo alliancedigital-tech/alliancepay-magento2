@@ -1,0 +1,28 @@
+<?php
+/** @var \Alliance\AlliancePay\Block\Product\View\PurchaseOptions $block */
+?>
+<?php if ($block->hasSubscriptionOption()): ?>
+<div class="alliance-purchase-options" data-mage-init='{"Alliance_AlliancePay/js/purchase-mode-selector": {}}'>
+    <div class="field choice">
+        <input type="radio" id="alliance-purchase-mode-onetime" name="alliance_purchase_mode" value="onetime" checked="checked"/>
+        <label for="alliance-purchase-mode-onetime"><?= $block->escapeHtml(__('Buy once')) ?></label>
+    </div>
+    <div class="field choice">
+        <input type="radio" id="alliance-purchase-mode-subscribe" name="alliance_purchase_mode" value="subscribe"/>
+        <label for="alliance-purchase-mode-subscribe"><?= $block->escapeHtml(__('Subscribe & Save')) ?></label>
+    </div>
+    <?php $plans = $block->getSubscriptionPlans(); ?>
+    <?php if (count($plans) === 1): ?>
+        <input type="hidden" name="alliance_plan_id" value="<?= (int)current($plans)->getEntityId() ?>"/>
+    <?php else: ?>
+        <div class="field alliance-purchase-plan">
+            <label for="alliance-plan-id"><?= $block->escapeHtml(__('Choose a plan')) ?></label>
+            <select id="alliance-plan-id" name="alliance_plan_id">
+                <?php foreach ($plans as $plan): ?>
+                    <option value="<?= (int)$plan->getEntityId() ?>"><?= $block->escapeHtml($plan->getName()) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>

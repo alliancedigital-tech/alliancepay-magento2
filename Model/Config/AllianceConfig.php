@@ -20,6 +20,8 @@ class AllianceConfig
     public const XML_PATH_ALLIANCE_PAY_TITLE = 'payment/alliance_payment_config/title';
     public const XML_PATH_ALLIANCE_PAY_API_URL = 'payment/alliance_payment_config/api_url';
     public const XML_PATH_ALLIANCE_PAY_MERCHANT_ID = 'payment/alliance_payment_config/merchant_id';
+    public const XML_PATH_ALLIANCE_PAY_JWS_PRIVATE_KEY = 'payment/alliance_payment_config/jws_private_key';
+    public const XML_PATH_ALLIANCE_PAY_JWS_KEY_ID = 'payment/alliance_payment_config/jws_key_id';
     public const XML_PATH_ALLIANCE_PAY_STATUS_PAGE_TYPE = 'payment/alliance_payment_config/status_page_type';
     public const XML_PATH_ALLIANCE_PAYMENT_TYPE = 'payment/alliance_payment_config/payment_type';
     public const XML_PATH_ALLIANCE_PAY_SUCCESS_ORDER_STATUS = 'payment/alliance_payment_config/success_order_status';
@@ -30,6 +32,11 @@ class AllianceConfig
     public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_EXP_DATE = 'payment/alliance_payment_config/pre_auth_exp_date';
     public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_ORDER_STATUS = 'payment/alliance_payment_config/pre_auth_order_status';
     public const XML_PATH_ALLIANCE_PAY_PRE_AUTH_CAPTURE_SUCCESS_STATUS = 'payment/alliance_payment_config/pre_auth_capture_success_status';
+    public const XML_PATH_ALLIANCE_SUBSCRIPTION_REPRICE_LEAD_TIME_DAYS = 'payment/alliance_subscription_config/reprice_lead_time_days';
+    public const XML_PATH_ALLIANCE_SUBSCRIPTION_RECURRING_AMOUNT_FIELD_PATH = 'payment/alliance_subscription_config/recurring_amount_field_path';
+
+    private const DEFAULT_REPRICE_LEAD_TIME_DAYS = 30;
+    private const DEFAULT_RECURRING_AMOUNT_FIELD_PATH = 'coinAmount';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
@@ -66,6 +73,22 @@ class AllianceConfig
     public function getMerchantId(): ?string
     {
         return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_MERCHANT_ID);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getJwsPrivateKey(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_JWS_PRIVATE_KEY);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getJwsKeyId(): ?string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_JWS_KEY_ID);
     }
 
     /**
@@ -146,5 +169,24 @@ class AllianceConfig
     public function getPreAuthCaptureSuccessStatus(): ?string
     {
         return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_PAY_PRE_AUTH_CAPTURE_SUCCESS_STATUS);
+    }
+
+    /**
+     * @return int
+     */
+    public function getRepriceLeadTimeDays(): int
+    {
+        $value = $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_SUBSCRIPTION_REPRICE_LEAD_TIME_DAYS);
+
+        return $value !== null ? (int)$value : self::DEFAULT_REPRICE_LEAD_TIME_DAYS;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRecurringAmountFieldPath(): string
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ALLIANCE_SUBSCRIPTION_RECURRING_AMOUNT_FIELD_PATH)
+            ?? self::DEFAULT_RECURRING_AMOUNT_FIELD_PATH;
     }
 }

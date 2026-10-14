@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="1column">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Alliance\AlliancePay\Block\Customer\SubscriptionList"
+                   name="alliance_customer_subscription_list"
+                   template="Alliance_AlliancePay::customer/subscription_list.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

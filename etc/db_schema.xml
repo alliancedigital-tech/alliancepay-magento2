@@ -144,4 +144,204 @@
             <column name="merchant_id"/>
         </index>
     </table>
+    <table name="alliance_subscription_plan_template" resource="default" engine="innodb"
+           comment="Alliance Subscription Plan Template Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="code" nullable="false" length="64" comment="Code"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+        <column xsi:type="varchar" name="category_indicator" nullable="true" length="64" comment="Category Indicator"/>
+        <column xsi:type="text" name="rules_template" nullable="false" comment="Rules Template"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="20" default="active" comment="Status"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <column xsi:type="datetime" name="updated_at" nullable="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_CODE">
+            <column name="code"/>
+        </constraint>
+    </table>
+    <table name="alliance_subscription_plan" resource="default" engine="innodb"
+           comment="Alliance Subscription Plan Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="provider_plan_id" nullable="true" length="255" comment="Provider Plan ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="int" name="template_id" unsigned="true" nullable="true" comment="Template ID"/>
+        <column xsi:type="varchar" name="plan_key" nullable="false" length="64" comment="Plan Key"/>
+        <column xsi:type="boolean" name="is_active" nullable="false" default="true" comment="Is Active"/>
+        <column xsi:type="int" name="active_subscriptions_count" unsigned="true" nullable="false" default="0"
+                comment="Active Subscriptions Count"/>
+        <column xsi:type="varchar" name="sync_status" nullable="false" length="20" default="SYNCED"
+                comment="Sync Status"/>
+        <column xsi:type="text" name="sync_error" nullable="true" comment="Sync Error"/>
+        <column xsi:type="varchar" name="version_id" nullable="true" length="255" comment="Version ID"/>
+        <column xsi:type="varchar" name="merchant_id" nullable="false" length="255" comment="Merchant ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+        <column xsi:type="varchar" name="description" nullable="true" length="500" comment="Description"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="20" comment="Status"/>
+        <column xsi:type="varchar" name="category_indicator" nullable="true" length="64" comment="Category Indicator"/>
+        <column xsi:type="text" name="rules" nullable="false" comment="Rules"/>
+        <column xsi:type="datetime" name="applies_from" nullable="true" comment="Applies From"/>
+        <column xsi:type="datetime" name="applies_to" nullable="true" comment="Applies To"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <column xsi:type="datetime" name="updated_at" nullable="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_PROVIDER_PLAN_ID">
+            <column name="provider_plan_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_PLAN_KEY">
+            <column name="plan_key"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID"
+                    table="alliance_subscription_plan" column="product_id"
+                    referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_ID_ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_ENTITY_ID"
+                    table="alliance_subscription_plan" column="template_id"
+                    referenceTable="alliance_subscription_plan_template" referenceColumn="entity_id" onDelete="SET NULL"/>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_PLAN_PRODUCT_ID" indexType="btree">
+            <column name="product_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_PLAN_TEMPLATE_ID" indexType="btree">
+            <column name="template_id"/>
+        </index>
+    </table>
+    <table name="alliance_subscription" resource="default" engine="innodb"
+           comment="Alliance Subscription Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="int" name="plan_id" unsigned="true" nullable="false" comment="Plan ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" comment="Customer ID"/>
+        <column xsi:type="text" name="rules_snapshot" nullable="false" comment="Rules Snapshot"/>
+        <column xsi:type="varchar" name="provider_order_id" nullable="false" length="255" comment="Provider Order ID"/>
+        <column xsi:type="varchar" name="merchant_request_id" nullable="false" length="255" comment="Merchant Request ID"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="20" default="PENDING" comment="Status"/>
+        <column xsi:type="text" name="callback_data" nullable="true" comment="Callback Data"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <column xsi:type="datetime" name="updated_at" nullable="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ALLIANCE_SUBSCRIPTION_PROVIDER_ORDER_ID">
+            <column name="provider_order_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID"
+                    table="alliance_subscription" column="order_id"
+                    referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_ID_ALLIANCE_SUBSCRIPTION_PLAN_ENTITY_ID"
+                    table="alliance_subscription" column="plan_id"
+                    referenceTable="alliance_subscription_plan" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID"
+                    table="alliance_subscription" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_PLAN_ID" indexType="btree">
+            <column name="plan_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_CUSTOMER_ID" indexType="btree">
+            <column name="customer_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_MERCHANT_REQUEST_ID" indexType="btree">
+            <column name="merchant_request_id"/>
+        </index>
+    </table>
+    <table name="alliance_subscription_scheduled_payment" resource="default" engine="innodb"
+           comment="Alliance Subscription Scheduled Payment Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="subscription_id" unsigned="true" nullable="false" comment="Subscription ID"/>
+        <column xsi:type="varchar" name="provider_order_id" nullable="false" length="255" comment="Provider Order ID"/>
+        <column xsi:type="varchar" name="scheduled_payment_id" nullable="true" length="255" comment="Scheduled Payment ID"/>
+        <column xsi:type="int" name="payment_number" unsigned="true" nullable="true" comment="Payment Number"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="20" comment="Status"/>
+        <column xsi:type="datetime" name="scheduled_date" nullable="true" comment="Scheduled Date"/>
+        <column xsi:type="datetime" name="executed_at" nullable="true" comment="Executed At"/>
+        <column xsi:type="varchar" name="operation_id" nullable="true" length="255" comment="Operation ID"/>
+        <column xsi:type="int" name="retry_count" unsigned="true" nullable="false" default="0" comment="Retry Count"/>
+        <column xsi:type="varchar" name="amount_reconciliation_status" nullable="true" length="20" default="OK"
+                comment="Amount Reconciliation Status"/>
+        <column xsi:type="varchar" name="reconciliation_note" nullable="true" length="500" comment="Reconciliation Note"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <column xsi:type="datetime" name="updated_at" nullable="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ALLIANCE_SCHEDULED_PAYMENT_OPERATION_ID">
+            <column name="operation_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SCHEDULED_PAYMENT_SUBSCRIPTION_ID_ALLIANCE_SUBSCRIPTION_ENTITY_ID"
+                    table="alliance_subscription_scheduled_payment" column="subscription_id"
+                    referenceTable="alliance_subscription" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="ALLIANCE_SCHEDULED_PAYMENT_SUBSCRIPTION_ID" indexType="btree">
+            <column name="subscription_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SCHEDULED_PAYMENT_PROVIDER_ORDER_ID" indexType="btree">
+            <column name="provider_order_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SCHEDULED_PAYMENT_SCHEDULED_PAYMENT_ID" indexType="btree">
+            <column name="scheduled_payment_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SCHEDULED_PAYMENT_PROVIDER_ORDER_ID_SCHEDULED_PAYMENT_ID" indexType="btree">
+            <column name="provider_order_id"/>
+            <column name="scheduled_payment_id"/>
+        </index>
+    </table>
+    <table name="alliance_subscription_plan_version_history" resource="default" engine="innodb"
+           comment="Alliance Subscription Plan Version History Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="plan_id" unsigned="true" nullable="false" comment="Plan ID"/>
+        <column xsi:type="varchar" name="old_version_id" nullable="true" length="255" comment="Old Version ID"/>
+        <column xsi:type="varchar" name="new_version_id" nullable="true" length="255" comment="New Version ID"/>
+        <column xsi:type="text" name="old_rules" nullable="true" comment="Old Rules"/>
+        <column xsi:type="text" name="new_rules" nullable="false" comment="New Rules"/>
+        <column xsi:type="datetime" name="applies_from" nullable="false" comment="Applies From"/>
+        <column xsi:type="varchar" name="reason" nullable="true" length="500" comment="Reason"/>
+        <column xsi:type="int" name="created_by" unsigned="true" nullable="true" comment="Created By"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_VERSION_HISTORY_PLAN_ID_ALLIANCE_SUBSCRIPTION_PLAN_ENTITY_ID"
+                    table="alliance_subscription_plan_version_history" column="plan_id"
+                    referenceTable="alliance_subscription_plan" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_PLAN_VERSION_HISTORY_CREATED_BY_ADMIN_USER_USER_ID"
+                    table="alliance_subscription_plan_version_history" column="created_by"
+                    referenceTable="admin_user" referenceColumn="user_id" onDelete="SET NULL"/>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_PLAN_VERSION_HISTORY_PLAN_ID" indexType="btree">
+            <column name="plan_id"/>
+        </index>
+    </table>
+    <table name="alliance_subscription_audit_log" resource="default" engine="innodb"
+           comment="Alliance Subscription Audit Log Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="action" nullable="false" length="64" comment="Action"/>
+        <column xsi:type="int" name="plan_id" unsigned="true" nullable="true" comment="Plan ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="true" comment="Product ID"/>
+        <column xsi:type="int" name="user_id" unsigned="true" nullable="true" comment="User ID"/>
+        <column xsi:type="text" name="details" nullable="true" comment="Details"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_PLAN_ID_ALLIANCE_SUBSCRIPTION_PLAN_ENTITY_ID"
+                    table="alliance_subscription_audit_log" column="plan_id"
+                    referenceTable="alliance_subscription_plan" referenceColumn="entity_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID"
+                    table="alliance_subscription_audit_log" column="product_id"
+                    referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_USER_ID_ADMIN_USER_USER_ID"
+                    table="alliance_subscription_audit_log" column="user_id"
+                    referenceTable="admin_user" referenceColumn="user_id" onDelete="SET NULL"/>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_PLAN_ID" indexType="btree">
+            <column name="plan_id"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_ACTION" indexType="btree">
+            <column name="action"/>
+        </index>
+        <index referenceId="ALLIANCE_SUBSCRIPTION_AUDIT_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
 </schema>

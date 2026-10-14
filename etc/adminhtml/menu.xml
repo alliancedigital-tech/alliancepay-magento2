@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2026 Alliance Dgtl. https://alb.ua/uk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Alliance_AlliancePay::subscriptions"
+             title="Subscriptions"
+             module="Alliance_AlliancePay"
+             sortOrder="60"
+             resource="Alliance_AlliancePay::subscriptions"/>
+        <add id="Alliance_AlliancePay::plan_template"
+             title="Plan Templates"
+             module="Alliance_AlliancePay"
+             sortOrder="10"
+             parent="Alliance_AlliancePay::subscriptions"
+             action="alliance_pay/plantemplate/index"
+             resource="Alliance_AlliancePay::plan_template"/>
+        <add id="Alliance_AlliancePay::subscription_plan"
+             title="Subscription Plans"
+             module="Alliance_AlliancePay"
+             sortOrder="20"
+             parent="Alliance_AlliancePay::subscriptions"
+             action="alliance_pay/subscriptionplan/index"
+             resource="Alliance_AlliancePay::subscription_plan"/>
+        <add id="Alliance_AlliancePay::subscription"
+             title="Subscriptions"
+             module="Alliance_AlliancePay"
+             sortOrder="30"
+             parent="Alliance_AlliancePay::subscriptions"
+             action="alliance_pay/subscription/index"
+             resource="Alliance_AlliancePay::subscription"/>
+        <add id="Alliance_AlliancePay::scheduled_payment"
+             title="Scheduled Payments"
+             module="Alliance_AlliancePay"
+             sortOrder="40"
+             parent="Alliance_AlliancePay::subscriptions"
+             action="alliance_pay/scheduledpayment/index"
+             resource="Alliance_AlliancePay::scheduled_payment"/>
+    </menu>
+</config>
