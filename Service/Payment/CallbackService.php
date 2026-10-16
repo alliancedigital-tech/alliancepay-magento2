@@ -63,6 +63,12 @@ class CallbackService
                 );
             }
 
+            if (!$this->hasOperationData($callbackData)) {
+                $this->logger->info('Callback skipped: no operation data.');
+
+                return [AllianceOrderInterface::ORDER_STATUS => AllianceOrderInterface::ORDER_STATUS_PENDING];
+            }
+
             $convertedCallback = $this->convertDataService->camelToSnakeArrayKeys($callbackData);
 
             if ($convertedCallback[AllianceOrderInterface::HPP_ORDER_ID]) {
@@ -364,6 +370,18 @@ class CallbackService
         }
 
         return null;
+    }
+
+    /**
+     * @param array $callbackData Original camelCase payload
+     * @return bool
+     */
+    private function hasOperationData(array $callbackData): bool
+    {
+        return !empty(array_filter(
+            $this->getOperationsFromCallbackData($callbackData),
+            static fn($operation): bool => is_array($operation) && !empty($operation)
+        ));
     }
 
     /**

@@ -61,6 +61,12 @@
             </argument>
         </arguments>
     </type>
+    <type name="Alliance\AlliancePay\Model\Payment\Command\RefundAmountResolver">
+        <arguments>
+            <argument name="serializer" xsi:type="object">Magento\Framework\Serialize\Serializer\Json</argument>
+            <argument name="logger" xsi:type="object">Alliance\AlliancePay\Logger\Logger</argument>
+        </arguments>
+    </type>
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
             <argument name="sensitive" xsi:type="array">

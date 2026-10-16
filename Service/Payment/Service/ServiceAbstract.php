@@ -33,7 +33,7 @@ abstract class ServiceAbstract
             $amount = $amount * 100;
         }
 
-        return (int) $amount;
+        return (int) round($amount);
     }
 
     /**

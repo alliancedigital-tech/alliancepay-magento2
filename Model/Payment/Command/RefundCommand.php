@@ -9,15 +9,13 @@ namespace Alliance\AlliancePay\Model\Payment\Command;
 
 use Alliance\AlliancePay\Api\AllianceOrderRepositoryInterface;
 use Alliance\AlliancePay\Api\Data\AllianceOrderInterface;
-use Alliance\AlliancePay\Logger\Logger;
 use Alliance\AlliancePay\Model\Payment\AlliancePayment;
 use Alliance\AlliancePay\Model\Payment\Processor\RefundProcessor;
 use Alliance\AlliancePay\Model\Payment\Validator\RefundRestrictionValidator;
-use Exception;
-use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
+use Magento\Sales\Model\Order\Payment;
 
 /**
  * Class RefundCommand.
@@ -29,8 +27,7 @@ class RefundCommand implements CommandInterface
         private readonly AlliancePayment $alliancePayment,
         private readonly AllianceOrderRepositoryInterface $allianceOrderRepository,
         private readonly RefundRestrictionValidator $refundRestrictionValidator,
-        private readonly SerializerInterface $serializer,
-        private readonly Logger $logger
+        private readonly RefundAmountResolver $refundAmountResolver
     ) {}
 
     /**
@@ -59,7 +56,14 @@ class RefundCommand implements CommandInterface
             );
         }
         $resolvedOperationId = $this->resolveForRefundOperationId($allianceOrder, $operationId);
-        $refundCoinAmount = $this->resolveRefundCoinAmount($allianceOrder, (float)$amount);
+        $order = $payment->getOrder();
+        $orderCurrencyAmount = $this->resolveOrderCurrencyAmount($payment, (float)$amount);
+        $refundCoinAmount = $this->refundAmountResolver->resolve(
+            $allianceOrder,
+            $orderCurrencyAmount,
+            (float)$order->getGrandTotal(),
+            $this->resolveAlreadyRefunded($payment, $orderCurrencyAmount)
+        );
 
         $result = $this->refundProcessor->processRefund(
             $resolvedOperationId,
@@ -85,23 +89,7 @@ class RefundCommand implements CommandInterface
             return $fallbackOperationId;
         }
 
-        $callbackData = $allianceOrder->getCallbackData();
-        if (empty($callbackData)) {
-            return $fallbackOperationId;
-        }
-
-        try {
-            $data = $this->serializer->unserialize($callbackData);
-        } catch (Exception $e) {
-            $this->logger->error('Failed to unserialize callback_data: ' . $e->getMessage());
-
-            return $fallbackOperationId;
-        }
-
-        $operations = $data['operations'] ?? [];
-        if (empty($operations) && isset($data['operation'])) {
-            $operations = [$data['operation']];
-        }
+        $operations = $this->refundAmountResolver->getOperations($allianceOrder);
 
         foreach ($operations as $operation) {
             if (($operation['type'] ?? '') === AlliancePayment::OPERATION_TYPE_COMPLETION
@@ -115,27 +103,26 @@ class RefundCommand implements CommandInterface
     }
 
     /**
-     * @param AllianceOrderInterface $allianceOrder
-     * @param float $magentoRefundAmount
+     * @param Payment $payment
+     * @param float $orderCurrencyAmount
      * @return float
      */
-    private function resolveRefundCoinAmount(
-        AllianceOrderInterface $allianceOrder,
-        float $magentoRefundAmount
-    ): float {
-        $conversionRate = $allianceOrder->getConversionRate();
+    private function resolveAlreadyRefunded(Payment $payment, float $orderCurrencyAmount): float
+    {
+        $totalRefunded = (float)$payment->getOrder()->getTotalRefunded();
 
-        if ($conversionRate === null || $conversionRate <= 0) {
-            return $magentoRefundAmount;
-        }
+        return $payment->getCreditmemo() ? max(0.0, $totalRefunded - $orderCurrencyAmount) : $totalRefunded;
+    }
 
-        $originalCoinAmount = (int)$allianceOrder->getCoinAmount();
-        $refundCoinAmountConverted = (int) round($magentoRefundAmount * $conversionRate * 100);
+    /**
+     * @param Payment $payment
+     * @param float $baseAmount
+     * @return float
+     */
+    private function resolveOrderCurrencyAmount(Payment $payment, float $baseAmount): float
+    {
+        $creditmemo = $payment->getCreditmemo();
 
-        if ($refundCoinAmountConverted === $originalCoinAmount) {
-            return (float)($originalCoinAmount / 100);
-        }
-
-        return $magentoRefundAmount * $conversionRate;
+        return $creditmemo ? (float)$creditmemo->getGrandTotal() : $baseAmount;
     }
 }

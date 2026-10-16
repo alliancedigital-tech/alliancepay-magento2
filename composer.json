@@ -1,6 +1,6 @@
 {
     "name": "alliance/module-alliance-pay",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "description": "Alliance Bank payment method trough the Hosted Payment Page.",
     "type": "magento2-module",
     "require": {
@@ -12,7 +12,6 @@
     "license": [
         "MIT"
     ],
-    "minimum-stability": "stable",
     "autoload": {
         "files": [
             "registration.php"

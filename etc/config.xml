@@ -22,6 +22,7 @@
                 <is_redirect>true</is_redirect>
                 <can_refund>1</can_refund>
                 <can_refund_in_invoice>1</can_refund_in_invoice>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
             </alliance_pay>
             <alliance_pay_subscription>
                 <model>AlliancePaySubscriptionFacade</model>

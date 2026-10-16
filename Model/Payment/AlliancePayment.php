@@ -23,6 +23,7 @@ class AlliancePayment
     public const OPERATION_TYPE_A2A = 'ACCOUNT_2_ACCOUNT';
     public const OPERATION_TYPE_PREAUTH = 'PREAUTH';
     public const OPERATION_TYPE_COMPLETION = 'COMPLETION';
+    public const OPERATION_TYPE_REFUND = 'REFUND';
     public const DIRECT_TYPE_BANK_LINK = 'BANK_LINK';
     public const PRIORITY_BANK_CODE = 'ALL_BANKS';
 
